@@ -1,7 +1,9 @@
+
 Shader "Custom/ColorFilter" {
 	
     Properties {
 		_MainTex("Texture", 2D) = "white" {}
+        _Color("Color", Color) = (1, 1, 1, 1)
 	}
 
 	SubShader {
@@ -13,6 +15,7 @@ Shader "Custom/ColorFilter" {
 			
 			// Properties
 			sampler2D _MainTex;
+            float4 _Color;
 
             float abs(float val){
                 if(val >= 0.0)
@@ -153,15 +156,15 @@ Shader "Custom/ColorFilter" {
                         //		-----> if it is dark, make value lighter
                         if (val > 50.0) {
                             // light
-                            sat -= 10.0;
-                            val -= 5.0;
+                            sat -= 15.0;
+                            val -= 10.0;
                         } else if (val < 50.0) {
                             // dark
-                            sat -= 10.0;
-                            val += 5.0;
+                            sat -= 15.0;
+                            val += 10.0;
                         } else {
                             // neutral
-                            sat -= 10.0;
+                            sat -= 15.0;
                         }
                     } else if (sat < 55.0) {
                         // create a more intense version of this color
@@ -170,15 +173,15 @@ Shader "Custom/ColorFilter" {
                         //		-----> if it is dark, make value darker
                         if (val > 50.0) {
                             // light
-                            sat -= 10.0;
-                            val += 5.0;
+                            sat += 15.0;
+                            val += 10.0;
                         } else if (val < 50.0) {
                             // dark
-                            sat -= 10.0;
-                            val -= 5.0;
+                            sat += 15.0;
+                            val -= 10.0;
                         } else {
                             // neutral
-                            sat -= 10.0;
+                            sat += 15.0;
                         }
                     }
                 } else if (hue > 50.0 && hue <= 145.0) {
@@ -188,29 +191,29 @@ Shader "Custom/ColorFilter" {
                         // create a more muted version of this color
                         if (val > 50.0) {
                             // light
-                            sat -= 10.0;
-                            val -= 5.0;
+                            sat -= 15.0;
+                            val -= 10.0;
                         } else if (val < 50.0) {
                             // dark
-                            sat -= 10.0;
-                            val += 5.0;
+                            sat -= 15.0;
+                            val += 10.0;
                         } else {
                             // neutral
-                            sat -= 10.0;
+                            sat -= 15.0;
                         }
                     } else if (sat < 55.0) {
                         // create a more intense version of this color
                         if (val > 50.0) {
                             // light
-                            sat -= 10.0;
-                            val += 5.0;
+                            sat += 15.0;
+                            val += 10.0;
                         } else if (val < 50.0) {
                             // dark
-                            sat -= 10.0;
-                            val -= 5.0;
+                            sat += 15.0;
+                            val -= 10.0;
                         } else {
                             // neutral
-                            sat -= 10.0;
+                            sat += 15.0;
                         }
                     }
                 } else if (hue > 145.0 && hue <= 250.0) {
@@ -220,29 +223,29 @@ Shader "Custom/ColorFilter" {
                         // create a more muted version of this color
                         if (val > 50.0) {
                             // light
-                            sat -= 10.0;
-                            val -= 5.0;
+                            sat -= 15.0;
+                            val -= 10.0;
                         } else if (val < 50.0) {
                             // dark
-                            sat -= 10.0;
-                            val += 5.0;
+                            sat -= 15.0;
+                            val += 10.0;
                         } else {
                             // neutral
-                            sat -= 10.0;
+                            sat -= 15.0;
                         }
                     } else if (sat < 55.0) {
                         // create a more intense version of this color
                         if (val > 50.0) {
                             // light
-                            sat -= 10.0;
-                            val += 5.0;
+                            sat += 15.0;
+                            val += 10.0;
                         } else if (val < 50.0) {
                             // dark
-                            sat -= 10.0;
-                            val -= 5.0;
+                            sat += 15.0;
+                            val -= 10.0;
                         } else {
                             // neutral
-                            sat -= 10.0;
+                            sat += 15.0;
                         }
                     }
                 } else {
@@ -252,29 +255,29 @@ Shader "Custom/ColorFilter" {
                         // create a more muted version of this color
                         if (val > 50.0) {
                             // light
-                            sat -= 10.0;
-                            val -= 5.0;
+                            sat -= 15.0;
+                            val -= 10.0;
                         } else if (val < 50.0) {
                             // dark
-                            sat -= 10.0;
-                            val += 5.0;
+                            sat -= 15.0;
+                            val += 10.0;
                         } else {
                             // neutral
-                            sat -= 10.0;
+                            sat -= 15.0;
                         }
                     } else if (sat < 55.0) {
                         // create a more intense version of this color
                         if (val > 50.0) {
                             // light
-                            sat -= 10.0;
-                            val += 5.0;
+                            sat += 15.0;
+                            val += 10.0;
                         } else if (val < 50.0) {
                             // dark
-                            sat -= 10.0;
-                            val -= 5.0;
+                            sat += 15.0;
+                            val -= 10.0;
                         } else {
                             // neutral
-                            sat -= 10.0;
+                            sat += 15.0;
                         }
                     }
                 }
