@@ -302,8 +302,7 @@ Shader "Custom/ColorFilter" {
                 hsv = colorFilter(hsv);
                 // translate filtered color into RGB space
                 float4 rgb = hsvConverter(hsv);
-				
-				return rgb;
+                return rgb;
 			}
 
 			ENDCG
