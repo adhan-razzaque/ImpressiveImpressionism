@@ -311,8 +311,8 @@ Shader "Custom/ColorFilter" {
                 float4 rgb = hsvConverter(hsv);
 
                 //Debug.Log("result color: " + rgb);
-                // return rgb;
-                return float4(255, 255, 255, 1);
+                return rgb;
+                // return float4(255, 255, 255, 1);
 			}
 
 			ENDCG
