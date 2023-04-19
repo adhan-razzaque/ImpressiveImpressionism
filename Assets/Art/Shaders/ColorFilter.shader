@@ -183,11 +183,11 @@ Shader "Custom/ColorFilter" {
                         if (val > 50.0) {
                             // light
                             sat -= 5.0;
-                            val -= 5.0;
+                            val -= 2.0;
                         } else if (val < 50.0) {
                             // dark
                             sat -= 5.0;
-                            val += 5.0;
+                            val += 2.0;
                         } else {
                             // neutral
                             sat -= 5.0;
@@ -200,11 +200,11 @@ Shader "Custom/ColorFilter" {
                         if (val > 50.0) {
                             // light
                             sat += 5.0;
-                            val += 5.0;
+                            val += 2.0;
                         } else if (val < 50.0) {
                             // dark
                             sat += 5.0;
-                            val -= 5.0;
+                            val -= 2.0;
                         } else {
                             // neutral
                             sat += 5.0;
@@ -218,11 +218,11 @@ Shader "Custom/ColorFilter" {
                         if (val > 50.0) {
                             // light
                             sat -= 5.0;
-                            val -= 5.0;
+                            val -= 2.0;
                         } else if (val < 50.0) {
                             // dark
                             sat -= 5.0;
-                            val += 5.0;
+                            val += 2.0;
                         } else {
                             // neutral
                             sat -= 5.0;
@@ -232,11 +232,11 @@ Shader "Custom/ColorFilter" {
                         if (val > 50.0) {
                             // light
                             sat += 5.0;
-                            val += 5.0;
+                            val += 2.0;
                         } else if (val < 50.0) {
                             // dark
                             sat += 5.0;
-                            val -= 5.0;
+                            val -= 2.0;
                         } else {
                             // neutral
                             sat += 5.0;
@@ -250,11 +250,11 @@ Shader "Custom/ColorFilter" {
                         if (val > 50.0) {
                             // light
                             sat -= 5.0;
-                            val -= 5.0;
+                            val -= 2.0;
                         } else if (val < 50.0) {
                             // dark
                             sat -= 5.0;
-                            val += 5.0;
+                            val += 2.0;
                         } else {
                             // neutral
                             sat -= 5.0;
@@ -264,11 +264,11 @@ Shader "Custom/ColorFilter" {
                         if (val > 50.0) {
                             // light
                             sat += 5.0;
-                            val += 5.0;
+                            val += 2.0;
                         } else if (val < 50.0) {
                             // dark
                             sat += 5.0;
-                            val -= 5.0;
+                            val -= 2.0;
                         } else {
                             // neutral
                             sat += 5.0;
@@ -282,11 +282,11 @@ Shader "Custom/ColorFilter" {
                         if (val > 50.0) {
                             // light
                             sat -= 5.0;
-                            val -= 5.0;
+                            val -= 2.0;
                         } else if (val < 50.0) {
                             // dark
                             sat -= 5.0;
-                            val += 5.0;
+                            val += 2.0;
                         } else {
                             // neutral
                             sat -= 5.0;
@@ -296,11 +296,11 @@ Shader "Custom/ColorFilter" {
                         if (val > 50.0) {
                             // light
                             sat += 5.0;
-                            val += 5.0;
+                            val += 2.0;
                         } else if (val < 50.0) {
                             // dark
                             sat += 5.0;
-                            val -= 5.0;
+                            val -= 2.0;
                         } else {
                             // neutral
                             sat += 5.0;
