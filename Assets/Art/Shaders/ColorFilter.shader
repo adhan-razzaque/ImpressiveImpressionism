@@ -12,6 +12,7 @@ Shader "Custom/ColorFilter" {
 			#pragma vertex vert_img
 			#pragma fragment frag
             #include "UnityCG.cginc"
+            
 			
 			// Properties
 			sampler2D _MainTex;
@@ -35,100 +36,125 @@ Shader "Custom/ColorFilter" {
                 return v1;
             }
 
+            float trunc(float v){
+                float r = v % 1;
+                return v - r;
+            }
+
             /**
             * @brief Function to convert from RGB to HSV color space
             * 		  --> this implementation used code as a reference:
-            * 		  https://www.geeksforgeeks.org/program-change-rgb-color-model-hsv-color-model/
+            * 		  https://www.programmingalgorithms.com/algorithm/rgb-to-hsv/
             * 
             * @param rgb RGB space color to convert
             * @return HSV converted color
             */
             float4 rgbConverter(float4 rgb) : COLOR {
-                // change from RGB to percentage
-                float r = rgb[0] / 255;
-                float g = rgb[1] / 255;
-                float b = rgb[2] / 255;
+                float r = rgb[0] * 255;
+                float g = rgb[1] * 255;
+                float b = rgb[2] * 255;
 
-                float maxVal = max(r, max(g, b)); // maximum of r, g, b
-	            float minVal = min(r, min(g, b)); // minimum of r, g, b
-                float span = maxVal - minVal; // span of maxVal and minVal.
-                float h = -1, s = -1;
+                float maxVal = max(r, max(g, b));
+                float minVal = min(r, max(g, b));
+                float span = maxVal - minVal;
 
-                // if the max and min values are equivalent, 
-                // then all values are equal => we are in the grayscale => hue is 0
-                if (maxVal == minVal)
-                    h = 0;
-                else if (maxVal == r)
-                    // if red is predominate, use green - blue
-                    h = (60 * ((g - b) / span) + 360) % 360;
-                else if (maxVal == g)
-                    // if green is predominate, use blue - red
-                    h = (60 * ((b - r) / span) + 360) % 360;
-                else if (maxVal == b)
-                    // if blue is predominate, use red - green
-                    h = (60 * ((r - g) / span) + 360) % 360;
+                float hue = 0.0;
+                float sat = 0.0;
+                float val = maxVal;
+                if (val == 0.0) {
+                    sat = 0.0;
+                } else {
+                    sat = span / val;
+                }
 
-                // if maxVal equal zero => set saturation to 0 (& avoid div by 0)
-                if (maxVal == 0)
-                    s = 0;
-                else
-                    s = (span / maxVal) * 100;
+                if (sat == 0.0) {
+                    hue = 0.0;
+                } else {
+                    if (r == val)
+                        hue = (g - b) / span;
+                    else if (g == val)
+                        hue = 2.0 + (b - r) / span;
+                    else if (b == val)
+                        hue = 4.0 + (r - g) / span;
+                    
+                    hue *= 60.0;
+                    if (hue < 0.0)
+                        hue += 360.0;
+                }
 
-                // compute v
-                float v = maxVal * 100;
-                return float4(h, s, v, 1.0);
+                return float4(hue, sat, (val / 255.0), 1.0);
             }
 
             /**
             * @brief Function to convert from HSV to RGB color space
             * 		  This implementation used code as a reference:
-            * 		  --> https://www.codespeedy.com/hsv-to-rgb-in-cpp/
+            * 		  --> //https://www.programmingalgorithms.com/algorithm/hsv-to-rgb/
             * 
             * @param hsv HSV color to convert
             * @return converted RGB color
             */
             float4 hsvConverter(float4 hsv) : COLOR {
-                // convert s, v to percentages
-                float h = hsv[0];
-                float s = hsv[1] / 100;
-                float v = hsv[2] / 100;
-
-                float c = s * v;
-                float x = c * (1 - abs(((h / 60.0) % 2) - 1));
-                float m = v - c;
                 float r = 0.0;
                 float g = 0.0;
                 float b = 0.0;
+                float hue = hsv[0];
+                float sat = hsv[1];
+                float val = hsv[2];
 
-                if (h >= 0.0 && h < 60.0) {
-                    r = c;
-                    g = x;
-                    b = 0;
-                } else if (h >= 60.0 && h < 180.0) {
-                    r = x;
-                    g = c;
-                    b = 0;
-                } else if (h >= 120.0 && h < 180.0) {
-                    r = 0;
-                    g = c;
-                    b = x;
-                } else if (h >= 180.0 && h < 240.0) {
-                    r = 0;
-                    g = x;
-                    b = c;
-                } else if (h >= 240.0 && h < 300.0) {
-                    r = x;
-                    g = 0;
-                    b = c;
+                if (sat == 0) {
+                    r = val;
+                    g = val;
+                    b = val;
                 } else {
-                    r = c;
-                    g = 0;
-                    b = x;
+                    int i;
+                    float f, p, q, t;
+
+                    if (hue == 360.0)
+                        hue = 0.0;
+                    else   
+                        hue = hue / 60.0;
+
+                    i = (int)(trunc(hue));
+                    f = hue - i;
+                    p = val * (1.0 - sat);
+                    q = val * (1.0 - (sat * f));
+                    t = val * (1.0 - (sat * (1.0 - f)));
+
+                    switch (i) {
+                        case 0:
+                            r = val;
+                            g = t;
+                            b = p;
+                            break;
+                        case 1:
+                            r = q;
+                            g = val;
+                            b = p;
+                            break;
+                        case 2:
+                            r = p;
+                            g = val;
+                            b = t;
+                            break;
+                        case 3:
+                            r = p;
+                            g = q;
+                            b = val;
+                            break;
+                        case 4:
+                            r = t;
+                            g = p;
+                            b = val;
+                            break;
+
+                        default:
+                            r = val;
+                            g = p;
+                            b = q;
+                            break;
+                    }
                 }
 
-                r = (r + m) * 255;
-	            g = (g + m) * 255;
-	            b = (b + m) * 255;
                 return float4(r, g, b, 1.0);
             }
 
@@ -143,8 +169,8 @@ Shader "Custom/ColorFilter" {
                 // determine if the color at the current fragment is in line
 	            // with expected saturation at this hue
 	            float hue = hsv[0];
-	            float sat = hsv[1];
-	            float val = hsv[2];
+	            float sat = hsv[1] * 100;
+	            float val = hsv[2] * 100;
 
                 if (hue >= 0.0 && hue <= 50.0) {
                     // this is the red-orange range
@@ -292,8 +318,11 @@ Shader "Custom/ColorFilter" {
                     val = 100.0;
                 else if (val < 0.0)
                     val = 0.0;
+                 sat = sat / 100.0;
+                 val = val / 100.0;
 
                 return float4(hue, sat, val, 1.0);
+                // return hsv;
             }
 
 			float4 frag(v2f_img input) : COLOR {
