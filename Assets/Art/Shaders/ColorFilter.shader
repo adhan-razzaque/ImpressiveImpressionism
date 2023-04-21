@@ -55,7 +55,7 @@ Shader "Custom/ColorFilter" {
                 float b = rgb[2] * 255;
 
                 float maxVal = max(r, max(g, b));
-                float minVal = min(r, max(g, b));
+                float minVal = min(r, min(g, b));
                 float span = maxVal - minVal;
 
                 float hue = 0.0;
@@ -213,7 +213,7 @@ Shader "Custom/ColorFilter" {
                 } else if (hue > 50.0 && hue <= 145.0) {
                     // this is the yellow-green range
                     // expected saturation: 35-45%
-                    if (sat > 65.0) {
+                    if (sat > 45.0) {
                         // create a more muted version of this color
                         if (val > 50.0) {
                             // light
@@ -227,7 +227,7 @@ Shader "Custom/ColorFilter" {
                             // neutral
                             sat -= 5.0;
                         }
-                    } else if (sat < 55.0) {
+                    } else if (sat < 35.0) {
                         // create a more intense version of this color
                         if (val > 50.0) {
                             // light
@@ -245,7 +245,7 @@ Shader "Custom/ColorFilter" {
                 } else if (hue > 145.0 && hue <= 250.0) {
                     // this is the blue-indigo range
                     // expected saturation: 70-80%
-                    if (sat > 65.0) {
+                    if (sat > 80.0) {
                         // create a more muted version of this color
                         if (val > 50.0) {
                             // light
@@ -259,7 +259,7 @@ Shader "Custom/ColorFilter" {
                             // neutral
                             sat -= 5.0;
                         }
-                    } else if (sat < 55.0) {
+                    } else if (sat < 70.0) {
                         // create a more intense version of this color
                         if (val > 50.0) {
                             // light
@@ -277,7 +277,7 @@ Shader "Custom/ColorFilter" {
                 } else {
                     // this is the violet-fuschia range
                     // expected saturation: 40-50%
-                    if (sat > 65.0) {
+                    if (sat > 50.0) {
                         // create a more muted version of this color
                         if (val > 50.0) {
                             // light
@@ -291,7 +291,7 @@ Shader "Custom/ColorFilter" {
                             // neutral
                             sat -= 5.0;
                         }
-                    } else if (sat < 55.0) {
+                    } else if (sat < 40.0) {
                         // create a more intense version of this color
                         if (val > 50.0) {
                             // light
@@ -341,56 +341,9 @@ Shader "Custom/ColorFilter" {
 
                 //Debug.Log("result color: " + rgb);
                 return rgb;
-                // return float4(255, 255, 255, 1);
 			}
 
 			ENDCG
 		}
 	}
 }
-
-// Shader "Custom/PostProcess"
-// {
-// 	Properties
-// 	{
-// 		_MainTex("Texture", 2D) = "white" {}
-// 		_Color("Color", Color) = (1, 1, 1, 1)
-// 		_VRadius("Vignette Radius", Range(0.0, 1.0)) = 0.8
-// 		_VSoft("Vignette Softness", Range(0.0, 1.0)) = 0.5
-// 	}
-
-// 	SubShader
-// 	{
-// 		Pass
-// 		{
-// 			CGPROGRAM
-// 			#pragma vertex vert_img
-// 			#pragma fragment frag
-//             #include "UnityCG.cginc"
-			
-// 			// Properties
-// 			sampler2D _MainTex;
-// 			float4 _Color;
-// 			float4 _GlitchColor;
-// 			float _VRadius;
-// 			float _VSoft;
-
-// 			float4 frag(v2f_img input) : COLOR
-// 			{
-//                 // sample texture for color
-// 				float4 base = tex2D(_MainTex, input.uv);
-// 				// average original color and new color
-//                 //base = base * _Color;
-
-// 				// add vignette
-// 				float distFromCenter = distance(input.uv.xy, float2(0.5, 0.5));
-// 				float vignette = smoothstep(_VRadius, _VRadius - _VSoft, distFromCenter);
-// 				base = saturate(base * vignette);
-				
-// 				return base;
-// 			}
-
-// 			ENDCG
-// 		}
-// 	}
-// }
