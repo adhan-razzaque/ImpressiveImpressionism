@@ -112,11 +112,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   kuwahara: {fileID: 4800000, guid: 10c8eeff983049089a5712b118f25e53, type: 3}
-  kernelSize: 20
-  sharpness: 8
-  hardness: 8
-  alpha: 1
-  zeroCrossing: 0.6
-  zeta: 1
+  kernelSize: 14
+  sharpness: 12.39
+  hardness: 100
+  alpha: 2
+  zeroCrossing: 0.334
+  zeta: 1.296
   enableZeta: 0
   passes: 1
