@@ -26,7 +26,7 @@
         sampler2D _MainTex;
         sampler2D tfm;
 
-        float4 main_tex_texel_size;
+        float4 _MainTex_TexelSize;
 
         int kernel_size;
         int size;
@@ -65,7 +65,7 @@
 
             float4 frag(v2f i): SV_Target
             {
-                float2 d = main_tex_texel_size.xy;
+                float2 d = _MainTex_TexelSize.xy;
 
                 const float3 Sx = (
                     1.0f * tex2D(_MainTex, i.uv + float2(-d.x, -d.y)).rgb +
@@ -107,7 +107,7 @@
 
                 for (int x = -kernel_radius; x <= kernel_radius; ++x)
                 {
-                    const float4 c = tex2D(_MainTex, i.uv + float2(x, 0) * main_tex_texel_size.xy);
+                    const float4 c = tex2D(_MainTex, i.uv + float2(x, 0) * _MainTex_TexelSize.xy);
                     const float gauss = gaussian_distribution(2.0f, x);
 
                     col += c * gauss;
@@ -132,7 +132,7 @@
                 float kernel_sum = 0.0f;
 
                 for (int y = -kernel_radius; y <= kernel_radius; ++y) {
-                    const float4 c = tex2D(_MainTex, i.uv + float2(0, y) * main_tex_texel_size.xy);
+                    const float4 c = tex2D(_MainTex, i.uv + float2(0, y) * _MainTex_TexelSize.xy);
                     const float gauss = gaussian_distribution(2.0f, y);
 
                     col += c * gauss;
@@ -217,7 +217,7 @@
                         float2 v = mul(transform, float2(x, y));
                         if (dot(v, v) <= 0.25f)
                         {
-                            float3 c = tex2D(_MainTex, i.uv + float2(x, y) * main_tex_texel_size.xy).rgb;
+                            float3 c = tex2D(_MainTex, i.uv + float2(x, y) * _MainTex_TexelSize.xy).rgb;
                             c = saturate(c);
                             float sum = 0;
                             float w[8];
