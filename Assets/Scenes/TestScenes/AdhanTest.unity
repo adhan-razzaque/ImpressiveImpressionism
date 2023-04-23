@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028331, g: 0.2257133, b: 0.3069217, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -722,6 +722,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Main Camera
+      objectReference: {fileID: 0}
+    - target: {fileID: 8183642151416857548, guid: 96a1e4cf6d52fe6409d9a7f3ed62527b,
+        type: 3}
+      propertyPath: enableZeta
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8183642151416857550, guid: 96a1e4cf6d52fe6409d9a7f3ed62527b,
         type: 3}
