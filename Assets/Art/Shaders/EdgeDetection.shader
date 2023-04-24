@@ -14,6 +14,10 @@ Shader "Custom/EdgeDetection"
         float _colorThreshold;
         float _depthThreshold;
 
+        /* constants */
+
+
+
         ENDCG
 
         Pass
@@ -71,7 +75,7 @@ Shader "Custom/EdgeDetection"
                 return sqrt(dot(g1, g1) + dot(g2, g2));
             }
 
-            float4 SobelFilter(sampler2D tex, float2 texCoord, float2 texelSize)
+            float4 SobelFilter(sampler2D tex, float2 texCoord, float2 texelSize, int gradient_id)
             {
                 // Gx: Horizontal filter
                 // -1,  0,  +1
@@ -82,6 +86,10 @@ Shader "Custom/EdgeDetection"
                 // +1,  +2,  +1
                 //  0,   0,   0
                 // -1,  -2,  -1
+
+                int _colorGradient_id = 1;
+                int _depthGradient_id = 2;
+                int _NormalGradient_id = 3;
 
                 float2 p1 = texCoord - float2(-1*texelSize.x, texelSize.y);
                 float2 p2 = texCoord - float2(0, texelSize.y);
@@ -94,21 +102,42 @@ Shader "Custom/EdgeDetection"
                 float2 p9 = texCoord - float2(texelSize.x, -1*texelSize.y);
 
                 // float4 gx = -1*p1 + 1*p3 - 2*p4 + 2*p6 - 1*p7 + 1*p9;
-
                 // float4 gy = 1*p1 + 2*p2 + 1*p3 - 1*p7 - 2*p8 - 1*p9;
-                float4 gx = float4(0,0,0,0);
-                float4 gy = float4(0,0,0,0);
 
-                gx = -1*tex2D(tex, p1) + 1*tex2D(tex, p3) - 2*tex2D(tex, p4) + 2*tex2D(tex, p6) - 1*tex2D(tex, p7) + 1*tex2D(tex, p9);
-                gy = 1*tex2D(tex, p1) + 2*tex2D(tex, p2) + 1*tex2D(tex, p3) - 1*tex2D(tex, p7) - 2*tex2D(tex, p8) - 1*tex2D(tex, p9);
+                if(gradient_id == _colorGradient_id) {
+                    /* calculate horizontal and vertical gradients */
+                    // gx = -1*tex2D(tex, p1) + 1*tex2D(tex, p3) - 2*tex2D(tex, p4) + 2*tex2D(tex, p6) - 1*tex2D(tex, p7) + 1*tex2D(tex, p9);
+                    // gy = 1*tex2D(tex, p1) + 2*tex2D(tex, p2) + 1*tex2D(tex, p3) - 1*tex2D(tex, p7) - 2*tex2D(tex, p8) - 1*tex2D(tex, p9);
+                    float4 g1 = tex2D(tex, p1) + 2*tex2D(tex, p2) + tex2D(tex, p3) - tex2D(tex, p7) - 2*tex2D(tex, p8) - tex2D(tex, p9);
+                    float4 g2 = tex2D(tex, p3) + 2*tex2D(tex, p6) + tex2D(tex, p9) - tex2D(tex, p1) - 2*tex2D(tex, p4) - tex2D(tex, p7);
 
-                // float4 g1 = (p1 + 2*p2 + p3) - (p7 + 2*p8 + p9);
-                // float4 g2 = (p3 + 2*p6 + p9) - (p1 + 2*p4 + p7);
-                // float4 g1 = tex2D(tex, p1) + 2*tex2D(tex, p2) + tex2D(tex, p3) - tex2D(tex, p7) - 2*tex2D(tex, p8) - tex2D(tex, p9);
-                // float4 g2 = tex2D(tex, p3) + 2*tex2D(tex, p6) + tex2D(tex, p9) - tex2D(tex, p1) - 2*tex2D(tex, p4) - tex2D(tex, p7);
-                // return sqrt(dot(g1, g1)) + sqrt(dot(g2, g2));
-                return sqrt(dot(gx, gx) + dot(gy, gy));
+                    /* calculate gradient magnitude */
+                    return sqrt(dot(g1, g1) + dot(g2, g2));
+                }
+                else if(gradient_id == _depthGradient_id) {
+                    /* calculate depth at each pixel */
+                    float depth_p1 = Linear01Depth(tex2D(tex, p1).r) * _ProjectionParams.z;
+                    float depth_p2 = Linear01Depth(tex2D(tex, p2).r) * _ProjectionParams.z;
+                    float depth_p3 = Linear01Depth(tex2D(tex, p3).r) * _ProjectionParams.z;
+                    float depth_p4 = Linear01Depth(tex2D(tex, p4).r) * _ProjectionParams.z;
+                    float depth_p5 = Linear01Depth(tex2D(tex, p5).r) * _ProjectionParams.z;
+                    float depth_p6 = Linear01Depth(tex2D(tex, p6).r) * _ProjectionParams.z;
+                    float depth_p7 = Linear01Depth(tex2D(tex, p7).r) * _ProjectionParams.z;
+                    float depth_p8 = Linear01Depth(tex2D(tex, p8).r) * _ProjectionParams.z;
+                    float depth_p9 = Linear01Depth(tex2D(tex, p9).r) * _ProjectionParams.z;
+
+                    /* calculate horizontal and vertical gradients */
+                    float4 gx = -1*depth_p1 + 1*depth_p3 - 2*depth_p4 + 2*depth_p6 - 1*depth_p7 + 1*depth_p9;
+                    float4 gy = 1*depth_p1 + 2*depth_p2 + 1*depth_p3 - 1*depth_p7 - 2*depth_p8 - 1*depth_p9;
+
+                    /* calculate gradient magnitude */
+                    return sqrt(dot(gx, gx) + dot(gy, gy));
+                }
+
+                return 0;
             }
+
+
 
             float4 PrewittFilter(sampler2D tex, float2 texCoord, float2 texelSize) {
                 // Gx: Horizontal filter
@@ -139,15 +168,18 @@ Shader "Custom/EdgeDetection"
 
             fixed4 frag (v2f i) : SV_Target
             {
+                int _colorGradient_id = 1;
+                int _depthGradient_id = 2;
+                int _NormalGradient_id = 3;
 
                 if(!_enableEdgeDetection) {
                     return tex2D(_MainTex, i.uv);
                 }
 
-                float color_gradient = SobelFilter(_MainTex, i.uv, _MainTex_TexelSize.xy);
-                float depth = Linear01Depth(tex2D(_CameraDepthTexture, i.uv).r);
+                float color_gradient = SobelFilter(_MainTex, i.uv, _MainTex_TexelSize.xy, _colorGradient_id);
+                // float depth = Linear01Depth(tex2D(_CameraDepthTexture, i.uv).r);
 
-                if(color_gradient > _colorThreshold && depth < _depthThreshold) {
+                if(color_gradient > _colorThreshold /*&& depth < _depthThreshold*/) {
                     return float4(0, 0, 0, 0);
                 }
                 else {
