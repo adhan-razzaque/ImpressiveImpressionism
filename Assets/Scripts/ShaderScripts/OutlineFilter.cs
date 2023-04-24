@@ -2,19 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EdgeDetectionCamera : MonoBehaviour
+public class OutlineFilter : MonoBehaviour
 {
-    public Shader edgeDetectionShader;
+    public Shader outlineShader;
 
     /* properties */    
     [Header("Edge Detection")]
-    public bool enableEdgeDetection;
-    [Range(0.0f, 10.0f)] public float colorThreshold = 0.20f;    /* gradient's Threshold  to define edges based on color */
-    [Range(0.0f, 10.0f)] public float depthThreshold = 0.50f;    /* gradient's threshold to define edges based on depth  */
+    public bool enableOutlining = true;
+    [Range(0.0f, 25.0f)] public float colorThreshold = 0.20f;    /* gradient's Threshold  to define edges based on color */
+    [Range(0.0f, 25.0f)] public float depthThreshold = 0.50f;    /* gradient's threshold to define edges based on depth  */
     [Range(0.0f, 1.0f)] public float maxDepth = 1.0f;          /* max depth of the scene where 0 = camera location, 1 = rear clipping plane*/
 
     /* define shader's properties */
-    private readonly int enableEdgeDetection_id = Shader.PropertyToID("_enableEdgeDetection");
+    private readonly int enableOutlining_id = Shader.PropertyToID("_enableOutlining");
     private readonly int colorThreshold_id = Shader.PropertyToID("_colorThreshold");
     private readonly int depthThreshold_id = Shader.PropertyToID("_depthThreshold");
     private readonly int maxDepth_id = Shader.PropertyToID("_maxDepth");
@@ -23,12 +23,12 @@ public class EdgeDetectionCamera : MonoBehaviour
     private Material postprocessMaterial;
 
     private void Start() {
-        if (edgeDetectionShader == null) {
+        if (outlineShader == null) {
             Debug.LogError("No Edge Detection Shader");
             return;
         }
 
-        postprocessMaterial = new Material(edgeDetectionShader);
+        postprocessMaterial = new Material(outlineShader);
 
         Camera cam = GetComponent<Camera>();
         cam.depthTextureMode = cam.depthTextureMode | DepthTextureMode.Depth;
@@ -42,7 +42,7 @@ public class EdgeDetectionCamera : MonoBehaviour
         }
 
         /* set properties */
-        postprocessMaterial.SetInt(enableEdgeDetection_id, enableEdgeDetection ? 1 : 0);
+        postprocessMaterial.SetInt(enableOutlining_id, enableOutlining ? 1 : 0);
         postprocessMaterial.SetFloat(colorThreshold_id, colorThreshold);
         postprocessMaterial.SetFloat(depthThreshold_id, depthThreshold);
         postprocessMaterial.SetFloat(maxDepth_id, maxDepth);

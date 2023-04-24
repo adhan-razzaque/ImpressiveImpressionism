@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.17225231, g: 0.46466595, b: 0.49285987, a: 1}
+  m_IndirectSpecularColor: {r: 0.17225169, g: 0.4646652, b: 0.49285764, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &4
 LightmapSettings:
@@ -136,6 +136,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Main Camera
+      objectReference: {fileID: 0}
+    - target: {fileID: 8183642151416857548, guid: 96a1e4cf6d52fe6409d9a7f3ed62527b,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8183642151416857548, guid: 96a1e4cf6d52fe6409d9a7f3ed62527b,
+        type: 3}
+      propertyPath: enableZeta
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8183642151416857549, guid: 96a1e4cf6d52fe6409d9a7f3ed62527b,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8183642151416857550, guid: 96a1e4cf6d52fe6409d9a7f3ed62527b,
         type: 3}
@@ -727,3 +742,26 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: eded051879df4c147b9010199d240258, type: 3}
+--- !u!1 &2041106206 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8183642151416857537, guid: 96a1e4cf6d52fe6409d9a7f3ed62527b,
+    type: 3}
+  m_PrefabInstance: {fileID: 202764923}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2041106218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2041106206}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7127e3db4afab5943a9d88576c6b528a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlineShader: {fileID: 4800000, guid: 5813c7982681d8a45b40df2d710f1963, type: 3}
+  enableOutlining: 1
+  colorThreshold: 0.2
+  depthThreshold: 4.4
+  maxDepth: 1

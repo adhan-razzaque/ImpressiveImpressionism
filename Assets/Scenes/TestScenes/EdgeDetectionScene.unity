@@ -997,8 +997,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7127e3db4afab5943a9d88576c6b528a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  edgeDetectionShader: {fileID: 4800000, guid: 5813c7982681d8a45b40df2d710f1963, type: 3}
-  enableEdgeDetection: 0
-  colorThreshold: 0.2
+  outlineShader: {fileID: 4800000, guid: 5813c7982681d8a45b40df2d710f1963, type: 3}
+  enableOutlining: 1
+  colorThreshold: 1.7
   depthThreshold: 0.5
   maxDepth: 1

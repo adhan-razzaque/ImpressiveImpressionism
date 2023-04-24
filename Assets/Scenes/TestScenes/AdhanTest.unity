@@ -785,6 +785,29 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 96a1e4cf6d52fe6409d9a7f3ed62527b, type: 3}
+--- !u!1 &1187324210 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8183642151416857537, guid: 96a1e4cf6d52fe6409d9a7f3ed62527b,
+    type: 3}
+  m_PrefabInstance: {fileID: 1187324209}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1187324211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1187324210}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7127e3db4afab5943a9d88576c6b528a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlineShader: {fileID: 4800000, guid: 5813c7982681d8a45b40df2d710f1963, type: 3}
+  enableOutlining: 1
+  colorThreshold: 0.8
+  depthThreshold: 8.8
+  maxDepth: 1
 --- !u!1 &1475880391
 GameObject:
   m_ObjectHideFlags: 0

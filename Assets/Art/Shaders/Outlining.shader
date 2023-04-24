@@ -15,7 +15,7 @@ Shader "Custom/EdgeDetection"
         float4 _MainTex_TexelSize;
 
         /* Shader Properties */
-        int _enableEdgeDetection;
+        int _enableOutlining;
         float _colorThreshold;
         float _depthThreshold;
         float _maxDepth;
@@ -171,7 +171,7 @@ Shader "Custom/EdgeDetection"
             fixed4 frag (v2f i) : SV_Target
             {
 
-                if(!_enableEdgeDetection) {
+                if(!_enableOutlining) {
                     return tex2D(_MainTex, i.uv);
                 }
 
