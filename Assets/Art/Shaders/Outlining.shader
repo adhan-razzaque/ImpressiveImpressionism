@@ -19,6 +19,7 @@ Shader "Custom/EdgeDetection"
         float _colorThreshold;
         float _depthThreshold;
         float _maxDepth;
+        float _outlineDimness;
 
         ENDCG
 
@@ -165,6 +166,31 @@ Shader "Custom/EdgeDetection"
                     return true; //edge
                 }
                 return false; //no edge
+            }
+
+            float4 getOutlineColor(float2 texCoord, float2 texelSize) {
+                float2 depthArray[9];
+                depthArray[0] = texCoord + float2(-1*texelSize.x, texelSize.y);
+                depthArray[1] = texCoord + float2(0, texelSize.y);
+                depthArray[2] = texCoord + float2(texelSize.x, texelSize.y);
+                depthArray[3] = texCoord + float2(-1*texelSize.x, 0);
+                depthArray[4] = texCoord;
+                depthArray[5] = texCoord + float2(texelSize.x, 0);
+                depthArray[6] = texCoord + float2(-1*texelSize.x, -1*texelSize.y);
+                depthArray[7] = texCoord + float2(0, -1*texelSize.y);
+                depthArray[8] = texCoord + float2(texelSize.x, -1*texelSize.y);
+
+                /* calculate average color */
+                float4 color = float4(0.0f, 0.0f, 0.0f, 0.0f);
+                for(int i = 0; i < 9; i++) {
+                    color += tex2D(_MainTex, depthArray[i]);
+                }
+                color /= 9.0f;
+
+                /* darken color */
+                color *= _outlineDimness;
+
+                return color;
 
             }
 
@@ -178,7 +204,8 @@ Shader "Custom/EdgeDetection"
                 float depth = Linear01Depth(tex2D(_CameraDepthTexture, i.uv).r);
 
                 if(depth < _maxDepth && (DepthSobelFilter(i.uv, _MainTex_TexelSize) || ColorSobelFilter(i.uv, _MainTex_TexelSize))) {
-                    return float4(0.0, 0.0f, 0.0f, 1.0f);
+                    // return float4(0.0, 0.0f, 0.0f, 1.0f);
+                    return getOutlineColor(i.uv, _MainTex_TexelSize);
                 }
                 else {
                     return tex2D(_MainTex, i.uv);
