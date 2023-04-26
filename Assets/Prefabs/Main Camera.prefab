@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8183642151416857536}
   - component: {fileID: 8183642151416857549}
   - component: {fileID: 315176339339938917}
+  - component: {fileID: 1345675873995764490}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -99,6 +100,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   colorFilterShader: {fileID: 4800000, guid: 89d86980b8e4c54439d169e149d61615, type: 3}
+  RedOrange: 55
+  YellowGreen: 80
+  BlueIndigo: 70
+  VioletFuschia: 40
 --- !u!114 &315176339339938917
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -134,3 +139,21 @@ MonoBehaviour:
       depthContribution: 1
       bumpPower: 0.8
       bumpIntensity: 0.4
+--- !u!114 &1345675873995764490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8183642151416857537}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7127e3db4afab5943a9d88576c6b528a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlineShader: {fileID: 4800000, guid: 5813c7982681d8a45b40df2d710f1963, type: 3}
+  enableOutlining: 1
+  colorThreshold: 0.2
+  depthThreshold: 4.4
+  maxDepth: 1
+  outlineDimness: 0.5
