@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: f2cbacbb30e449778593e56f55df8e40
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - edgeFlowShader: {fileID: 4800000, guid: 6f6bafca157cdaa4b94ae03a0b5d508f, type: 3}
+  - noiseTexture: {fileID: 2800000, guid: 635d94471b8bf0d44b3d3a843975e4b0, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
