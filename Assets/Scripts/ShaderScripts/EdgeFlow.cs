@@ -6,11 +6,7 @@ namespace ShaderScripts
 {
     public class EdgeFlow : MonoBehaviour
     {
-        public Shader edgeFlowShader;
-        public Texture2D noiseTexture;
-
-        [Range(1, 64)] public int streamLineLength = 10;
-        [Range(0f, 2f)] public float streamKernelStrength = 0.5f;
+        public EdgeFlowSettings settings;
 
         // Private state
         private Material _mRenderMaterial;
@@ -22,13 +18,13 @@ namespace ShaderScripts
 
         private void OnEnable()
         {
-            if (edgeFlowShader == null)
+            if (settings.edgeFlowShader == null)
             {
                 Debug.LogError("Missing a supplied Kuwahara shader");
                 return;
             }
 
-            _mRenderMaterial = new Material(edgeFlowShader)
+            _mRenderMaterial = new Material(settings.edgeFlowShader)
             {
                 // Leave destruction up to this script
                 hideFlags = HideFlags.HideAndDontSave
@@ -45,9 +41,9 @@ namespace ShaderScripts
             if (_mRenderMaterial == null) return;
 
             // Set properties
-            _mRenderMaterial.SetTexture(NoiseTex, noiseTexture);
-            _mRenderMaterial.SetInt(StreamLineLength, streamLineLength);
-            _mRenderMaterial.SetFloat(StreamKernelStrength, streamKernelStrength);
+            _mRenderMaterial.SetTexture(NoiseTex, settings.noiseTexture);
+            _mRenderMaterial.SetInt(StreamLineLength, settings.streamLineLength);
+            _mRenderMaterial.SetFloat(StreamKernelStrength, settings.streamKernelStrength);
             
             // var edgeFlowTex = RenderTexture.GetTemporary(source.width, source.height, 0, RenderTextureFormat.RFloat);
             var edgeFlowTex = RenderTexture.GetTemporary(source.width, source.height, 0, source.format);
@@ -57,6 +53,16 @@ namespace ShaderScripts
             Graphics.Blit(edgeFlowTex, destination);
             
             RenderTexture.ReleaseTemporary(edgeFlowTex);
+        }
+        
+        [Serializable]
+        public class EdgeFlowSettings
+        {
+            public Shader edgeFlowShader;
+            public Texture2D noiseTexture;
+
+            [Range(1, 64)] public int streamLineLength = 10;
+            [Range(0f, 2f)] public float streamKernelStrength = 0.5f;
         }
     }
 }
