@@ -1,41 +1,51 @@
-
 Shader "Custom/ColorFilter" {
-	
+    
     Properties {
-		_MainTex("Texture", 2D) = "white" {}
+        _MainTex("Texture", 2D) = "white" {}
         _Color("Color", Color) = (1, 1, 1, 1)
-	}
+    }
 
-	SubShader {
-		Pass {
-			CGPROGRAM
-			#pragma vertex vert_img
-			#pragma fragment frag
+    SubShader {
+        Pass {
+            CGPROGRAM
+            #pragma vertex vert_img
+            #pragma fragment frag
             #include "UnityCG.cginc"
             
-			
-			// Properties
-			sampler2D _MainTex;
+            
+            // Properties
+            sampler2D _MainTex;
             float4 _Color;
 
+            float red_orange;
+            float yellow_green;
+            float blue_indigo;
+            float violet_fuschia;
+
+            //Math helper functions
+
+            // absolute value
             float abs(float val){
                 if(val >= 0.0)
                     return val;
                 return val * -1;
             }
 
+            // find maximum
             float max(float v1, float v2){
                 if(v1 >= v2)
                     return v1;
                 return v2;
             }
 
+            // find minimum
             float min(float v1, float v2){
                 if(v1 >= v2)
                     return v2;
                 return v1;
             }
 
+            // truncate (for positive numbers)
             float trunc(float v){
                 float r = v % 1;
                 return v - r;
@@ -43,8 +53,8 @@ Shader "Custom/ColorFilter" {
 
             /**
             * @brief Function to convert from RGB to HSV color space
-            * 		  --> this implementation used code as a reference:
-            * 		  https://www.programmingalgorithms.com/algorithm/rgb-to-hsv/
+            *         --> this implementation used code as a reference:
+            *         https://www.programmingalgorithms.com/algorithm/rgb-to-hsv/
             * 
             * @param rgb RGB space color to convert
             * @return HSV converted color
@@ -87,8 +97,8 @@ Shader "Custom/ColorFilter" {
 
             /**
             * @brief Function to convert from HSV to RGB color space
-            * 		  This implementation used code as a reference:
-            * 		  --> //https://www.programmingalgorithms.com/algorithm/hsv-to-rgb/
+            *         This implementation used code as a reference:
+            *         --> //https://www.programmingalgorithms.com/algorithm/hsv-to-rgb/
             * 
             * @param hsv HSV color to convert
             * @return converted RGB color
@@ -165,46 +175,47 @@ Shader "Custom/ColorFilter" {
             * @param rgb the rgb value of this fragment
             * @return Color the adjusted color to be rendered
             */
+            // float4 colorFilter(float4 hsv) : COLOR {
             float4 colorFilter(float4 hsv) : COLOR {
                 // determine if the color at the current fragment is in line
-	            // with expected saturation at this hue
-	            float hue = hsv[0];
-	            float sat = hsv[1] * 100;
-	            float val = hsv[2] * 100;
+                // with expected saturation at this hue
+                float hue = hsv[0];
+                float sat = hsv[1] * 100;
+                float val = hsv[2] * 100;
 
                 if (hue >= 0.0 && hue <= 50.0) {
                     // this is the red-orange range
                     // expected saturation: 55-65%
-                    if (sat > 65.0) {
+                    if (sat > (red_orange + 10.0)) {
                         // create a more muted version of this color
-                        //		=> decrease saturation, subdue value
-                        //		-----> if it is light, make value darker
-                        //		-----> if it is dark, make value lighter
+                        //      => decrease saturation, subdue value
+                        //      -----> if it is light, make value darker
+                        //      -----> if it is dark, make value lighter
                         if (val > 50.0) {
                             // light
                             sat -= 5.0;
-                            val -= 2.0;
+                            val -= 5.0;
                         } else if (val < 50.0) {
                             // dark
                             sat -= 5.0;
-                            val += 2.0;
+                            val += 5.0;
                         } else {
                             // neutral
                             sat -= 5.0;
                         }
-                    } else if (sat < 55.0) {
+                    } else if (sat < red_orange) {
                         // create a more intense version of this color
-                        //		=> increase saturation, enhance value
-                        //		-----> if it is light, make value lighter
-                        //		-----> if it is dark, make value darker
+                        //      => increase saturation, enhance value
+                        //      -----> if it is light, make value lighter
+                        //      -----> if it is dark, make value darker
                         if (val > 50.0) {
                             // light
                             sat += 5.0;
-                            val += 2.0;
+                            val += 5.0;
                         } else if (val < 50.0) {
                             // dark
                             sat += 5.0;
-                            val -= 2.0;
+                            val -= 5.0;
                         } else {
                             // neutral
                             sat += 5.0;
@@ -212,31 +223,31 @@ Shader "Custom/ColorFilter" {
                     }
                 } else if (hue > 50.0 && hue <= 145.0) {
                     // this is the yellow-green range
-                    // expected saturation: 35-45%
-                    if (sat > 45.0) {
+                    // expected saturation: 80-90%
+                    if (sat > (yellow_green + 10.0)) {
                         // create a more muted version of this color
                         if (val > 50.0) {
                             // light
                             sat -= 5.0;
-                            val -= 2.0;
+                            val -= 5.0;
                         } else if (val < 50.0) {
                             // dark
                             sat -= 5.0;
-                            val += 2.0;
+                            val += 5.0;
                         } else {
                             // neutral
                             sat -= 5.0;
                         }
-                    } else if (sat < 35.0) {
+                    } else if (sat < yellow_green) {
                         // create a more intense version of this color
                         if (val > 50.0) {
                             // light
                             sat += 5.0;
-                            val += 2.0;
+                            val += 5.0;
                         } else if (val < 50.0) {
                             // dark
                             sat += 5.0;
-                            val -= 2.0;
+                            val -= 5.0;
                         } else {
                             // neutral
                             sat += 5.0;
@@ -245,30 +256,30 @@ Shader "Custom/ColorFilter" {
                 } else if (hue > 145.0 && hue <= 250.0) {
                     // this is the blue-indigo range
                     // expected saturation: 70-80%
-                    if (sat > 80.0) {
+                    if (sat > (blue_indigo + 10.0)) {
                         // create a more muted version of this color
                         if (val > 50.0) {
                             // light
                             sat -= 5.0;
-                            val -= 2.0;
+                            val -= 5.0;
                         } else if (val < 50.0) {
                             // dark
                             sat -= 5.0;
-                            val += 2.0;
+                            val += 5.0;
                         } else {
                             // neutral
                             sat -= 5.0;
                         }
-                    } else if (sat < 70.0) {
+                    } else if (sat < blue_indigo) {
                         // create a more intense version of this color
                         if (val > 50.0) {
                             // light
                             sat += 5.0;
-                            val += 2.0;
+                            val += 5.0;
                         } else if (val < 50.0) {
                             // dark
                             sat += 5.0;
-                            val -= 2.0;
+                            val -= 5.0;
                         } else {
                             // neutral
                             sat += 5.0;
@@ -277,30 +288,30 @@ Shader "Custom/ColorFilter" {
                 } else {
                     // this is the violet-fuschia range
                     // expected saturation: 40-50%
-                    if (sat > 50.0) {
+                    if (sat > (violet_fuschia + 10.0)) {
                         // create a more muted version of this color
                         if (val > 50.0) {
                             // light
                             sat -= 5.0;
-                            val -= 2.0;
+                            val -= 5.0;
                         } else if (val < 50.0) {
                             // dark
                             sat -= 5.0;
-                            val += 2.0;
+                            val += 5.0;
                         } else {
                             // neutral
                             sat -= 5.0;
                         }
-                    } else if (sat < 40.0) {
+                    } else if (sat < violet_fuschia) {
                         // create a more intense version of this color
                         if (val > 50.0) {
                             // light
                             sat += 5.0;
-                            val += 2.0;
+                            val += 5.0;
                         } else if (val < 50.0) {
                             // dark
                             sat += 5.0;
-                            val -= 2.0;
+                            val -= 5.0;
                         } else {
                             // neutral
                             sat += 5.0;
@@ -325,9 +336,9 @@ Shader "Custom/ColorFilter" {
                 // return hsv;
             }
 
-			float4 frag(v2f_img input) : COLOR {
+            float4 frag(v2f_img input) : COLOR {
                 // sample texture for color
-				float4 base = tex2D(_MainTex, input.uv);
+                float4 base = tex2D(_MainTex, input.uv);
                 //Debug.Log("pixel color: " + base);
                 
                 // translate base color into HSV space
@@ -341,9 +352,9 @@ Shader "Custom/ColorFilter" {
 
                 //Debug.Log("result color: " + rgb);
                 return rgb;
-			}
+            }
 
-			ENDCG
-		}
-	}
+            ENDCG
+        }
+    }
 }
