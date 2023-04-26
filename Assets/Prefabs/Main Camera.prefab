@@ -12,7 +12,8 @@ GameObject:
   - component: {fileID: 8183642151416857551}
   - component: {fileID: 8183642151416857536}
   - component: {fileID: 8183642151416857549}
-  - component: {fileID: 8183642151416857548}
+  - component: {fileID: 315176339339938917}
+  - component: {fileID: 1345675873995764490}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -99,7 +100,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   colorFilterShader: {fileID: 4800000, guid: 89d86980b8e4c54439d169e149d61615, type: 3}
---- !u!114 &8183642151416857548
+  RedOrange: 55
+  YellowGreen: 80
+  BlueIndigo: 70
+  VioletFuschia: 40
+--- !u!114 &315176339339938917
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -108,15 +113,47 @@ MonoBehaviour:
   m_GameObject: {fileID: 8183642151416857537}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5fbd1e733fbb4df096d696da4502403f, type: 3}
+  m_Script: {fileID: 11500000, guid: 0352c3677d344e44b04878d288280c7a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  kuwahara: {fileID: 4800000, guid: 10c8eeff983049089a5712b118f25e53, type: 3}
-  kernelSize: 14
-  sharpness: 12.39
-  hardness: 100
-  alpha: 2
-  zeroCrossing: 0.334
-  zeta: 1.296
-  enableZeta: 0
-  passes: 1
+  kuwaharaShader: {fileID: 4800000, guid: 10c8eeff983049089a5712b118f25e53, type: 3}
+  edgeFlowShader: {fileID: 4800000, guid: 6f6bafca157cdaa4b94ae03a0b5d508f, type: 3}
+  compositorShader: {fileID: 4800000, guid: 7abd61f4812e47248274189983b33800, type: 3}
+  settings:
+    kuwaharaSettings:
+      kernelSize: 2
+      sharpness: 8
+      hardness: 8
+      alpha: 1
+      zeroCrossing: 0.6
+      zeta: 1
+      enableZeta: 0
+      passes: 1
+    edgeFlowSettings:
+      noiseTexture: {fileID: 2800000, guid: 635d94471b8bf0d44b3d3a843975e4b0, type: 3}
+      streamLineLength: 10
+      streamKernelStrength: 0.5
+    compositorSettings:
+      edgeContribution: 1
+      flowContribution: 1
+      depthContribution: 1
+      bumpPower: 0.8
+      bumpIntensity: 0.4
+--- !u!114 &1345675873995764490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8183642151416857537}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7127e3db4afab5943a9d88576c6b528a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlineShader: {fileID: 4800000, guid: 5813c7982681d8a45b40df2d710f1963, type: 3}
+  enableOutlining: 1
+  colorThreshold: 0.2
+  depthThreshold: 4.4
+  maxDepth: 1
+  outlineDimness: 0.5
