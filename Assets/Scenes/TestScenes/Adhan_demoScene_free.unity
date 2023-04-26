@@ -137,6 +137,26 @@ PrefabInstance:
       propertyPath: m_Name
       value: Main Camera
       objectReference: {fileID: 0}
+    - target: {fileID: 8183642151416857549, guid: 96a1e4cf6d52fe6409d9a7f3ed62527b,
+        type: 3}
+      propertyPath: RedOrange
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8183642151416857549, guid: 96a1e4cf6d52fe6409d9a7f3ed62527b,
+        type: 3}
+      propertyPath: BlueIndigo
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8183642151416857549, guid: 96a1e4cf6d52fe6409d9a7f3ed62527b,
+        type: 3}
+      propertyPath: YellowGreen
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8183642151416857549, guid: 96a1e4cf6d52fe6409d9a7f3ed62527b,
+        type: 3}
+      propertyPath: VioletFuschia
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8183642151416857550, guid: 96a1e4cf6d52fe6409d9a7f3ed62527b,
         type: 3}
       propertyPath: m_RootOrder
