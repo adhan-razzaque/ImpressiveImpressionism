@@ -22,6 +22,10 @@ Shader "Custom/ColorFilter" {
             float blue_indigo;
             float violet_fuschia;
 
+            float add_red;
+            float add_green;
+            float add_blue;
+
             //Math helper functions
 
             // absolute value
@@ -350,7 +354,18 @@ Shader "Custom/ColorFilter" {
                 // translate filtered color into RGB space
                 float4 rgb = hsvConverter(hsv);
 
-                //Debug.Log("result color: " + rgb);
+                // add color level parameters
+                rgb[0] += add_red;
+                rgb[1] += add_green;
+                rgb[2] += add_blue;
+
+                if(rgb[0] > 1.0)
+                    rgb[0] = 1.0;
+                if(rgb[1] > 1.0)
+                    rgb[1] = 1.0;
+                if(rgb[2] > 1.0)
+                    rgb[2] = 1.0;
+
                 return rgb;
             }
 
