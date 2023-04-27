@@ -46,7 +46,7 @@ namespace ShaderScripts
                 return;
             }
 
-            cam.depthTextureMode = DepthTextureMode.Depth;
+            cam.depthTextureMode |= DepthTextureMode.Depth;
         }
 
         private void OnEnable()
