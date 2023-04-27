@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/Scenes/TestScenes/Adhan_demoScene_free.unity
+    guid: cc79422c569ee04489452f1eb467c2f8
   m_configObjects: {}

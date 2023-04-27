@@ -67,11 +67,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Painterly FP
       objectReference: {fileID: 0}
-    - target: {fileID: 5269945355364510514, guid: f2e0b7ae4dae8cf44955bccd3512b213,
-        type: 3}
-      propertyPath: canRun
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 5272657471857185710, guid: f2e0b7ae4dae8cf44955bccd3512b213,
         type: 3}
       propertyPath: isGrounded
@@ -85,23 +80,6 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 5011406362595988371}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2643453827304850352
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 951186484043148297}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 02de6d9883ee643689f219aaf7ac1f23, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  colorFilterShader: {fileID: 4800000, guid: 89d86980b8e4c54439d169e149d61615, type: 3}
-  RedOrange: 55
-  YellowGreen: 80
-  BlueIndigo: 70
-  VioletFuschia: 40
 --- !u!114 &744038516884985627
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -137,6 +115,23 @@ MonoBehaviour:
       depthContribution: 1
       bumpPower: 0.8
       bumpIntensity: 0.4
+--- !u!114 &2643453827304850352
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 951186484043148297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02de6d9883ee643689f219aaf7ac1f23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colorFilterShader: {fileID: 4800000, guid: 89d86980b8e4c54439d169e149d61615, type: 3}
+  RedOrange: 55
+  YellowGreen: 80
+  BlueIndigo: 70
+  VioletFuschia: 40
 --- !u!114 &4922923792863046281
 MonoBehaviour:
   m_ObjectHideFlags: 0
