@@ -58,9 +58,9 @@ Shader "Hidden/LineIntegralConvolution"
             int _StreamLineLength;
             float _KernelStrength;
 
-            float3 SampleMain(float2 uv)
+            float2 SampleMain(float2 uv)
             {
-                return tex2D(_MainTex, uv);
+                return tex2D(_MainTex, uv).rg;
             }
 
             float3 SampleNoise(float2 uv)
