@@ -6,47 +6,58 @@
     }
     SubShader
     {
-        CGINCLUDE
-        #include "UnityCG.cginc"
+        Tags
+        {
+            "RenderType" = "Opaque" "RenderPipeline" = "UniversalPipeline"
+        }
+
+        HLSLPROGRAM
+        #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
         static const float pi = 3.14159265358979323846f;
 
-        struct appdata
+        struct Attributes
         {
-            float4 vertex : POSITION;
+            float4 positionOS : POSITION;
             float2 uv : TEXCOORD0;
         };
 
-        struct v2f {
+        struct Varyings
+        {
+            // The positions in this struct must have the SV_POSITION semantic.
+            float4 positionHCS : SV_POSITION;
             float2 uv : TEXCOORD0;
-            float4 pos : SV_POSITION;
         };
 
         // Properties
-        sampler2D _MainTex;
-        sampler2D tfm;
+        CBUFFER_START(UnityPerMaterial)
+            sampler2D _MainTex;
+            sampler2D tfm;
 
-        float4 _MainTex_TexelSize;
+            float4 _MainTex_TexelSize;
 
-        int kernel_size;
-        int size;
-        int n;
+            int kernel_size;
+            int size;
+            int n;
 
-        float sharpness;
-        float alpha;
-        float zeta;
-        float zero_crossing;
-        float hardness;
+            float sharpness;
+            float alpha;
+            float zeta;
+            float zero_crossing;
+            float hardness;
+        CBUFFER_END
 
         // Helper functions
 
         // Same vertex shader across all passes
-        v2f vert (appdata i)
+        Varyings vert(Attributes IN)
         {
-            v2f o;
-            o.pos = UnityObjectToClipPos(i.vertex);
-            o.uv = i.uv;
-            return o;
+            Varyings OUT;
+
+            OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+            OUT.uv = IN.uv;
+
+            return OUT;
         }
 
         // Calculate normal distribution given a sigma and position
@@ -54,51 +65,157 @@
         {
             return (1.0f / (sigma * sqrt(2.0f * pi))) * exp(-0.5f * ((position * position) / (sigma * sigma)));
         }
-        ENDCG
+        ENDHLSL
 
         // Calculate Eigenvector for point
         Pass
         {
-            CGPROGRAM
+            HLSLPROGRAM
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
+            static const float pi = 3.14159265358979323846f;
+
+            struct Attributes
+            {
+                float4 positionOS : POSITION;
+                float2 uv : TEXCOORD0;
+            };
+
+            struct Varyings
+            {
+                // The positions in this struct must have the SV_POSITION semantic.
+                float4 positionHCS : SV_POSITION;
+                float2 uv : TEXCOORD0;
+            };
+
+            // Properties
+            CBUFFER_START(UnityPerMaterial)
+                sampler2D _MainTex;
+                sampler2D tfm;
+
+                float4 _MainTex_TexelSize;
+
+                int kernel_size;
+                int size;
+                int n;
+
+                float sharpness;
+                float alpha;
+                float zeta;
+                float zero_crossing;
+                float hardness;
+            CBUFFER_END
+
+            // Helper functions
+
+            // Same vertex shader across all passes
+            Varyings vert(Attributes IN)
+            {
+                Varyings OUT;
+
+                OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+                OUT.uv = IN.uv;
+
+                return OUT;
+            }
+
+            // Calculate normal distribution given a sigma and position
+            float gaussian_distribution(const float sigma, const float position)
+            {
+                return (1.0f / (sigma * sqrt(2.0f * pi))) * exp(-0.5f * ((position * position) / (sigma * sigma)));
+            }
             #pragma vertex vert
             #pragma fragment frag
 
-            float4 frag(v2f i): SV_Target
+            half4 frag(Varyings IN): SV_Target
             {
                 float2 d = _MainTex_TexelSize.xy;
 
                 const float3 Sx = (
-                    1.0f * tex2D(_MainTex, i.uv + float2(-d.x, -d.y)).rgb +
-                    2.0f * tex2D(_MainTex, i.uv + float2(-d.x, 0.0)).rgb +
-                    1.0f * tex2D(_MainTex, i.uv + float2(-d.x, d.y)).rgb +
-                    -1.0f * tex2D(_MainTex, i.uv + float2(d.x, -d.y)).rgb +
-                    -2.0f * tex2D(_MainTex, i.uv + float2(d.x, 0.0)).rgb +
-                    -1.0f * tex2D(_MainTex, i.uv + float2(d.x, d.y)).rgb
+                    1.0f * tex2D(_MainTex, IN.uv + float2(-d.x, -d.y)).rgb +
+                    2.0f * tex2D(_MainTex, IN.uv + float2(-d.x, 0.0)).rgb +
+                    1.0f * tex2D(_MainTex, IN.uv + float2(-d.x, d.y)).rgb +
+                    -1.0f * tex2D(_MainTex, IN.uv + float2(d.x, -d.y)).rgb +
+                    -2.0f * tex2D(_MainTex, IN.uv + float2(d.x, 0.0)).rgb +
+                    -1.0f * tex2D(_MainTex, IN.uv + float2(d.x, d.y)).rgb
                 ) / 4.0f;
 
                 const float3 Sy = (
-                    1.0f * tex2D(_MainTex, i.uv + float2(-d.x, -d.y)).rgb +
-                    2.0f * tex2D(_MainTex, i.uv + float2(0.0, -d.y)).rgb +
-                    1.0f * tex2D(_MainTex, i.uv + float2(d.x, -d.y)).rgb +
-                    -1.0f * tex2D(_MainTex, i.uv + float2(-d.x, d.y)).rgb +
-                    -2.0f * tex2D(_MainTex, i.uv + float2(0.0, d.y)).rgb +
-                    -1.0f * tex2D(_MainTex, i.uv + float2(d.x, d.y)).rgb
+                    1.0f * tex2D(_MainTex, IN.uv + float2(-d.x, -d.y)).rgb +
+                    2.0f * tex2D(_MainTex, IN.uv + float2(0.0, -d.y)).rgb +
+                    1.0f * tex2D(_MainTex, IN.uv + float2(d.x, -d.y)).rgb +
+                    -1.0f * tex2D(_MainTex, IN.uv + float2(-d.x, d.y)).rgb +
+                    -2.0f * tex2D(_MainTex, IN.uv + float2(0.0, d.y)).rgb +
+                    -1.0f * tex2D(_MainTex, IN.uv + float2(d.x, d.y)).rgb
                 ) / 4.0f;
 
 
                 return float4(dot(Sx, Sx), dot(Sy, Sy), dot(Sx, Sy), 1.0f);
             }
-            ENDCG
+            ENDHLSL
         }
 
         // Blur 1
         Pass
         {
-            CGPROGRAM
+            HLSLPROGRAM
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
+            static const float pi = 3.14159265358979323846f;
+
+            struct Attributes
+            {
+                float4 positionOS : POSITION;
+                float2 uv : TEXCOORD0;
+            };
+
+            struct Varyings
+            {
+                // The positions in this struct must have the SV_POSITION semantic.
+                float4 positionHCS : SV_POSITION;
+                float2 uv : TEXCOORD0;
+            };
+
+            // Properties
+            CBUFFER_START(UnityPerMaterial)
+                sampler2D _MainTex;
+                sampler2D tfm;
+
+                float4 _MainTex_TexelSize;
+
+                int kernel_size;
+                int size;
+                int n;
+
+                float sharpness;
+                float alpha;
+                float zeta;
+                float zero_crossing;
+                float hardness;
+            CBUFFER_END
+
+            // Helper functions
+
+            // Same vertex shader across all passes
+            Varyings vert(Attributes IN)
+            {
+                Varyings OUT;
+
+                OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+                OUT.uv = IN.uv;
+
+                return OUT;
+            }
+
+            // Calculate normal distribution given a sigma and position
+            float gaussian_distribution(const float sigma, const float position)
+            {
+                return (1.0f / (sigma * sqrt(2.0f * pi))) * exp(-0.5f * ((position * position) / (sigma * sigma)));
+            }
             #pragma vertex vert
             #pragma fragment frag
 
-            float4 frag(v2f i) : SV_Target
+            float4 frag(Varyings IN) : SV_Target
             {
                 const int kernel_radius = 5;
 
@@ -107,7 +224,7 @@
 
                 for (int x = -kernel_radius; x <= kernel_radius; ++x)
                 {
-                    const float4 c = tex2D(_MainTex, i.uv + float2(x, 0) * _MainTex_TexelSize.xy);
+                    const float4 c = tex2D(_MainTex, IN.uv + float2(x, 0) * _MainTex_TexelSize.xy);
                     const float gauss = gaussian_distribution(2.0f, x);
 
                     col += c * gauss;
@@ -116,23 +233,79 @@
 
                 return col / kernel_sum;
             }
-            ENDCG
+            ENDHLSL
         }
-        
+
         // Blur 2
-        Pass {
-            CGPROGRAM
+        Pass
+        {
+            HLSLPROGRAM
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
+            static const float pi = 3.14159265358979323846f;
+
+            struct Attributes
+            {
+                float4 positionOS : POSITION;
+                float2 uv : TEXCOORD0;
+            };
+
+            struct Varyings
+            {
+                // The positions in this struct must have the SV_POSITION semantic.
+                float4 positionHCS : SV_POSITION;
+                float2 uv : TEXCOORD0;
+            };
+
+            // Properties
+            CBUFFER_START(UnityPerMaterial)
+                sampler2D _MainTex;
+                sampler2D tfm;
+
+                float4 _MainTex_TexelSize;
+
+                int kernel_size;
+                int size;
+                int n;
+
+                float sharpness;
+                float alpha;
+                float zeta;
+                float zero_crossing;
+                float hardness;
+            CBUFFER_END
+
+            // Helper functions
+
+            // Same vertex shader across all passes
+            Varyings vert(Attributes IN)
+            {
+                Varyings OUT;
+
+                OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+                OUT.uv = IN.uv;
+
+                return OUT;
+            }
+
+            // Calculate normal distribution given a sigma and position
+            float gaussian_distribution(const float sigma, const float position)
+            {
+                return (1.0f / (sigma * sqrt(2.0f * pi))) * exp(-0.5f * ((position * position) / (sigma * sigma)));
+            }
             #pragma vertex vert
             #pragma fragment frag
 
-            float4 frag(v2f i) : SV_Target {
+            float4 frag(Varyings IN) : SV_Target
+            {
                 const int kernel_radius = 5;
 
                 float4 col = 0;
                 float kernel_sum = 0.0f;
 
-                for (int y = -kernel_radius; y <= kernel_radius; ++y) {
-                    const float4 c = tex2D(_MainTex, i.uv + float2(0, y) * _MainTex_TexelSize.xy);
+                for (int y = -kernel_radius; y <= kernel_radius; ++y)
+                {
+                    const float4 c = tex2D(_MainTex, IN.uv + float2(0, y) * _MainTex_TexelSize.xy);
                     const float gauss = gaussian_distribution(2.0f, y);
 
                     col += c * gauss;
@@ -141,31 +314,85 @@
 
                 float3 g = col.rgb / kernel_sum;
 
-                const float lambda1 = 0.5f * (g.y + g.x + sqrt(g.y * g.y - 2.0f * g.x * g.y + g.x * g.x + 4.0f * g.z * g.z));
-                const float lambda2 = 0.5f * (g.y + g.x - sqrt(g.y * g.y - 2.0f * g.x * g.y + g.x * g.x + 4.0f * g.z * g.z));
+                const float lambda1 = 0.5f * (g.y + g.x + sqrt(
+                    g.y * g.y - 2.0f * g.x * g.y + g.x * g.x + 4.0f * g.z * g.z));
+                const float lambda2 = 0.5f * (g.y + g.x - sqrt(
+                    g.y * g.y - 2.0f * g.x * g.y + g.x * g.x + 4.0f * g.z * g.z));
 
                 const float2 v = float2(lambda1 - g.x, -g.z);
                 float2 t = length(v) > 0.0 ? normalize(v) : float2(0.0f, 1.0f);
                 float phi = -atan2(t.y, t.x);
 
                 float a = (lambda1 + lambda2 > 0.0f) ? (lambda1 - lambda2) / (lambda1 + lambda2) : 0.0f;
-                
+
                 return float4(t, phi, a);
             }
-            ENDCG
+            ENDHLSL
         }
 
         // Anisotropic Kuwahara 
         Pass
         {
-            CGPROGRAM
+            HLSLPROGRAM
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
+            static const float pi = 3.14159265358979323846f;
+
+            struct Attributes
+            {
+                float4 positionOS : POSITION;
+                float2 uv : TEXCOORD0;
+            };
+
+            struct Varyings
+            {
+                // The positions in this struct must have the SV_POSITION semantic.
+                float4 positionHCS : SV_POSITION;
+                float2 uv : TEXCOORD0;
+            };
+
+            // Properties
+            CBUFFER_START(UnityPerMaterial)
+                sampler2D _MainTex;
+                sampler2D tfm;
+
+                float4 _MainTex_TexelSize;
+
+                int kernel_size;
+                int size;
+                int n;
+
+                float sharpness;
+                float alpha;
+                float zeta;
+                float zero_crossing;
+                float hardness;
+            CBUFFER_END
+
+            // Helper functions
+
+            // Same vertex shader across all passes
+            Varyings vert(Attributes IN)
+            {
+                Varyings OUT;
+
+                OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+                OUT.uv = IN.uv;
+
+                return OUT;
+            }
+
+            // Calculate normal distribution given a sigma and position
+            float gaussian_distribution(const float sigma, const float position)
+            {
+                return (1.0f / (sigma * sqrt(2.0f * pi))) * exp(-0.5f * ((position * position) / (sigma * sigma)));
+            }
             #pragma vertex vert
             #pragma fragment frag
-
-            float4 frag(v2f i) : SV_Target
+            float4 frag(Varyings IN) : SV_Target
             {
                 const float frag_alpha = alpha;
-                float4 t = tex2D(tfm, i.uv);
+                float4 t = tex2D(tfm, IN.uv);
 
                 const int kernel_radius = kernel_size / uint(2);
                 const float a = float(kernel_radius) * clamp((frag_alpha + t.w) / frag_alpha, 0.1f, 2.0f);
@@ -201,7 +428,7 @@
                 float3 s[8];
 
                 int k;
-                
+
                 for (k = 0; k < n; ++k)
                 {
                     m[k] = 0.0f;
@@ -217,7 +444,7 @@
                         float2 v = mul(transform, float2(x, y));
                         if (dot(v, v) <= 0.25f)
                         {
-                            float3 c = tex2D(_MainTex, i.uv + float2(x, y) * _MainTex_TexelSize.xy).rgb;
+                            float3 c = tex2D(_MainTex, IN.uv + float2(x, y) * _MainTex_TexelSize.xy).rgb;
                             c = saturate(c);
                             float sum = 0;
                             float w[8];
@@ -280,7 +507,7 @@
 
                 return saturate(output / output.w);
             }
-            ENDCG
+            ENDHLSL
         }
     }
 }
