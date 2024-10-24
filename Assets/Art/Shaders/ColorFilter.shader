@@ -1,30 +1,41 @@
+/*
+ * Shader: ColorFilter
+ * Author: Katie Clark
+ * Co-author/Porting: Adhan Razzaque
+ * Date: 10/23/2024
+ * Description: This shader applies a color filter to the rendered image.
+ * 
+ * Acknowledgements:
+ * - RGB to HSV conversion algorithm: https://www.programmingalgorithms.com/algorithm/rgb-to-hsv/
+ * - HSV to RGB conversion algorithm: https://www.programmingalgorithms.com/algorithm/hsv-to-rgb/
+ * 
+ * License: MIT License
+ */
 Shader "Custom/ColorFilter"
 {
-
-    Properties
-    {
-        _MainTex("Texture", 2D) = "white" {}
-        _Color("Color", Color) = (1, 1, 1, 1)
-    }
-
     SubShader
     {
+        Tags
+        {
+            "RenderType"="Opaque"
+            "RenderPipeline" = "UniversalPipeline"
+        }
+        LOD 100
+        ZWrite Off Cull Off
         Pass
         {
-            Tags
-            {
-                "RenderPipeline" = "UniversalPipeline"
-            }
+            Name "ColorFilter"
+
             HLSLPROGRAM
-            #pragma vertex vert
+            #pragma vertex Vert
             #pragma fragment frag
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
 
             // Properties
+            TEXTURE2D_X(_CameraOpaqueTexture);
+            SAMPLER(sampler_CameraOpaqueTexture);
             CBUFFER_START(UnityPerMaterial)
-                sampler2D _MainTex;
-                half4 _Color;
-
                 float red_orange;
                 float yellow_green;
                 float blue_indigo;
@@ -35,23 +46,8 @@ Shader "Custom/ColorFilter"
                 float add_blue;
             CBUFFER_END
 
-            // Structs
 
-            struct Varyings
-            {
-                // The positions in this struct must have the SV_POSITION semantic.
-                half4 positionHCS : SV_POSITION;
-                float2 uv : TEXCOORD0;
-            };
-
-            struct Attributes
-            {
-                half4 positionOS : POSITION;
-                float2 uv : TEXCOORD0;
-            };
-
-
-            //Math helper functions
+            // Math helper functions
 
             /**
              * @brief Function to calculate the absolute value of a given number
@@ -114,7 +110,7 @@ Shader "Custom/ColorFilter"
             * @param rgb RGB space color to convert
             * @return HSV converted color
             */
-            half4 rgbConverter(half4 rgb) : COLOR
+            float4 rgbConverter(float4 rgb) : COLOR
             {
                 float r = rgb[0] * 255;
                 float g = rgb[1] * 255;
@@ -154,7 +150,7 @@ Shader "Custom/ColorFilter"
                         hue += 360.0;
                 }
 
-                return half4(hue, sat, (val / 255.0), 1.0);
+                return float4(hue, sat, (val / 255.0), 1.0);
             }
 
             /**
@@ -165,7 +161,7 @@ Shader "Custom/ColorFilter"
             * @param hsv HSV color to convert
             * @return converted RGB color
             */
-            half4 hsvConverter(half4 hsv) : COLOR
+            float4 hsvConverter(float4 hsv) : COLOR
             {
                 float r = 0.0;
                 float g = 0.0;
@@ -232,7 +228,7 @@ Shader "Custom/ColorFilter"
                     }
                 }
 
-                return half4(r, g, b, 1.0);
+                return float4(r, g, b, 1.0);
             }
 
             /**
@@ -242,7 +238,7 @@ Shader "Custom/ColorFilter"
             * @param rgb the rgb value of this fragment
             * @return Color the adjusted color to be rendered
             */
-            half4 colorFilter(half4 hsv) : COLOR
+            float4 colorFilter(float4 hsv) : COLOR
             {
                 // determine if the color at the current fragment is in line
                 // with expected saturation at this hue
@@ -458,42 +454,33 @@ Shader "Custom/ColorFilter"
                 sat = sat / 100.0;
                 val = val / 100.0;
 
-                return half4(hue, sat, val, 1.0);
+                return float4(hue, sat, val, 1.0);
             }
 
-            Varyings vert(Attributes IN)
+            half4 frag(Varyings IN) : SV_Target
             {
-                Varyings OUT;
-                OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
-                OUT.uv = IN.uv;
-                return OUT;
-            }
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(IN)
 
-            half4 frag(Varyings IN) : COLOR
-            {
                 // sample texture for color
-                half4 base = tex2D(_MainTex, IN.uv);
+                float4 base = SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, IN.texcoord);
 
                 // translate base color into HSV space
-                half4 hsv = rgbConverter(base);
+                float4 hsv = rgbConverter(base);
 
                 // apply color filter
                 hsv = colorFilter(hsv);
 
                 // translate filtered color into RGB space
-                half4 rgb = hsvConverter(hsv);
+                float4 rgb = hsvConverter(hsv);
 
                 // add color level parameters
-                rgb[0] += add_red;
-                rgb[1] += add_green;
-                rgb[2] += add_blue;
+                rgb.r += add_red;
+                rgb.g += add_green;
+                rgb.b += add_blue;
 
-                if (rgb[0] > 1.0)
-                    rgb[0] = 1.0;
-                if (rgb[1] > 1.0)
-                    rgb[1] = 1.0;
-                if (rgb[2] > 1.0)
-                    rgb[2] = 1.0;
+                rgb.r = clamp(rgb.r, 0.0f, 1.0f);
+                rgb.g = clamp(rgb.g, 0.0f, 1.0f);
+                rgb.b = clamp(rgb.b, 0.0f, 1.0f);
 
                 return rgb;
             }
