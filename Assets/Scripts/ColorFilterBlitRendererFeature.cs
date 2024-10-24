@@ -6,14 +6,14 @@ internal class ColorFilterBlitRendererFeature : ScriptableRendererFeature
 {
     public Shader m_Shader;
 
-    public float red_orange = 0.55f;
-    public float yellow_green = 0.8f;
-    public float blue_indigo = 0.7f;
-    public float violet_fuschia = 0.4f;
+    public float redOrange = 0.55f;
+    public float yellowGreen = 0.8f;
+    public float blueIndigo = 0.7f;
+    public float violetFuschia = 0.4f;
 
-    public float add_red;
-    public float add_green;
-    public float add_blue;
+    public float addRed;
+    public float addGreen;
+    public float addBlue;
 
     private Material m_Material;
 
@@ -35,14 +35,14 @@ internal class ColorFilterBlitRendererFeature : ScriptableRendererFeature
         m_RenderPass.ConfigureInput(ScriptableRenderPassInput.Color);
         var settings = new ColorFilterBlitSettings
         {
-            red_orange = red_orange,
-            yellow_green = yellow_green,
-            violet_fuschia = violet_fuschia,
-            blue_indigo = blue_indigo,
-            
-            add_red = add_red,
-            add_green = add_green,
-            add_blue = add_blue,
+            RedOrange = redOrange,
+            YellowGreen = yellowGreen,
+            VioletFuschia = violetFuschia,
+            BlueIndigo = blueIndigo,
+
+            AddRed = addRed,
+            AddGreen = addGreen,
+            AddBlue = addBlue,
         };
         m_RenderPass.SetTarget(renderer.cameraColorTargetHandle, settings);
     }

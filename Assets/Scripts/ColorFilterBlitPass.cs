@@ -5,14 +5,14 @@ using UnityEngine.Rendering.Universal;
 
 public struct ColorFilterBlitSettings
 {
-    public float red_orange;
-    public float yellow_green;
-    public float violet_fuschia;
-    public float blue_indigo;
+    public float RedOrange;
+    public float YellowGreen;
+    public float VioletFuschia;
+    public float BlueIndigo;
 
-    public float add_red;
-    public float add_green;
-    public float add_blue;
+    public float AddRed;
+    public float AddGreen;
+    public float AddBlue;
 }
 
 
@@ -24,6 +24,13 @@ internal class ColorFilterBlitPass : ScriptableRenderPass
 
     private ColorFilterBlitSettings _settings;
 
+    private static readonly int RedOrange = Shader.PropertyToID("red_orange");
+    private static readonly int YellowGreen = Shader.PropertyToID("yellow_green");
+    private static readonly int VioletFuschia = Shader.PropertyToID("violet_fuschia");
+    private static readonly int BlueIndigo = Shader.PropertyToID("blue_indigo");
+    private static readonly int AddRed = Shader.PropertyToID("add_red");
+    private static readonly int AddGreen = Shader.PropertyToID("add_green");
+    private static readonly int AddBlue = Shader.PropertyToID("add_blue");
 
     public ColorFilterBlitPass(Material material)
     {
@@ -54,13 +61,13 @@ internal class ColorFilterBlitPass : ScriptableRenderPass
         CommandBuffer cmd = CommandBufferPool.Get();
         using (new ProfilingScope(cmd, m_ProfilingSampler))
         {
-            m_Material.SetFloat("red_orange", _settings.red_orange);
-            m_Material.SetFloat("yellow_green", _settings.yellow_green);
-            m_Material.SetFloat("violet_fuschia", _settings.violet_fuschia);
-            m_Material.SetFloat("blue_indigo", _settings.blue_indigo);
-            m_Material.SetFloat("add_red", _settings.add_red);
-            m_Material.SetFloat("add_green", _settings.add_green);
-            m_Material.SetFloat("add_blue", _settings.add_blue);
+            m_Material.SetFloat(RedOrange, _settings.RedOrange);
+            m_Material.SetFloat(YellowGreen, _settings.YellowGreen);
+            m_Material.SetFloat(VioletFuschia, _settings.VioletFuschia);
+            m_Material.SetFloat(BlueIndigo, _settings.BlueIndigo);
+            m_Material.SetFloat(AddRed, _settings.AddRed);
+            m_Material.SetFloat(AddGreen, _settings.AddGreen);
+            m_Material.SetFloat(AddBlue, _settings.AddBlue);
             Blitter.BlitCameraTexture(cmd, m_CameraColorTarget, m_CameraColorTarget, m_Material, 0);
         }
 
