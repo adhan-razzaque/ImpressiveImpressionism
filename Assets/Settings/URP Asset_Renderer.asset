@@ -75,10 +75,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Active: 1
   m_Shader: {fileID: 4800000, guid: 89d86980b8e4c54439d169e149d61615, type: 3}
-  red_orange: 0.55
-  yellow_green: 0.8
-  blue_indigo: 0.7
-  violet_fuschia: 0.4
-  add_red: 0
-  add_green: 0
-  add_blue: 0
+  redOrange: 55
+  yellowGreen: 80
+  blueIndigo: 70
+  violetFuschia: 40
+  addRed: 0
+  addGreen: 0
+  addBlue: 0
