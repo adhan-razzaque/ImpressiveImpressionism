@@ -6,10 +6,10 @@ internal class ColorFilterBlitRendererFeature : ScriptableRendererFeature
 {
     public Shader m_Shader;
 
-    public float redOrange = 0.55f;
-    public float yellowGreen = 0.8f;
-    public float blueIndigo = 0.7f;
-    public float violetFuschia = 0.4f;
+    public float redOrange = 55f;
+    public float yellowGreen = 80f;
+    public float blueIndigo = 70f;
+    public float violetFuschia = 40f;
 
     public float addRed;
     public float addGreen;
