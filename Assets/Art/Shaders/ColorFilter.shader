@@ -1,56 +1,103 @@
-Shader "Custom/ColorFilter" {
-    
-    Properties {
-        _MainTex("Texture", 2D) = "white" {}
-        _Color("Color", Color) = (1, 1, 1, 1)
-    }
+/*
+ * Shader: ColorFilter
+ * Author: Katie Clark
+ * Co-author/Porting: Adhan Razzaque
+ * Date: 10/23/2024
+ * Description: This shader applies a color filter to the rendered image.
+ * 
+ * Acknowledgements:
+ * - RGB to HSV conversion algorithm: https://www.programmingalgorithms.com/algorithm/rgb-to-hsv/
+ * - HSV to RGB conversion algorithm: https://www.programmingalgorithms.com/algorithm/hsv-to-rgb/
+ * 
+ * License: MIT License
+ */
+Shader "Custom/ColorFilter"
+{
+    SubShader
+    {
+        Tags
+        {
+            "RenderType"="Opaque"
+            "RenderPipeline" = "UniversalPipeline"
+        }
+        LOD 100
+        ZWrite Off Cull Off
+        Pass
+        {
+            Name "ColorFilter"
 
-    SubShader {
-        Pass {
-            CGPROGRAM
-            #pragma vertex vert_img
+            HLSLPROGRAM
+            #pragma vertex Vert
             #pragma fragment frag
-            #include "UnityCG.cginc"
-            
-            
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
+
             // Properties
-            sampler2D _MainTex;
-            float4 _Color;
+            TEXTURE2D_X(_CameraOpaqueTexture);
+            SAMPLER(sampler_CameraOpaqueTexture);
+            CBUFFER_START(UnityPerMaterial)
+                float red_orange;
+                float yellow_green;
+                float blue_indigo;
+                float violet_fuschia;
 
-            float red_orange;
-            float yellow_green;
-            float blue_indigo;
-            float violet_fuschia;
+                float add_red;
+                float add_green;
+                float add_blue;
+            CBUFFER_END
 
-            float add_red;
-            float add_green;
-            float add_blue;
 
-            //Math helper functions
+            // Math helper functions
 
-            // absolute value
-            float abs(float val){
-                if(val >= 0.0)
+            /**
+             * @brief Function to calculate the absolute value of a given number
+             * 
+             * @param val the value to calculate the absolute value of
+             * @return float the absolute value of the given number
+             */
+            float abs(float val)
+            {
+                if (val >= 0.0)
                     return val;
                 return val * -1;
             }
 
-            // find maximum
-            float max(float v1, float v2){
-                if(v1 >= v2)
+            /**
+             * @brief Function to calculate the maximum of two given numbers
+             *
+             * @param v1 the first value to compare
+             * @param v2 the second value to compare
+             * @return float the maximum of the two given numbers
+             */
+            float max(float v1, float v2)
+            {
+                if (v1 >= v2)
                     return v1;
                 return v2;
             }
 
-            // find minimum
-            float min(float v1, float v2){
-                if(v1 >= v2)
+            /**
+             * @brief Function to calculate the minimum of two given numbers
+             *
+             * @param v1 the first value to compare
+             * @param v2 the second value to compare
+             * @return float the minimum of the two given numbers
+             */
+            float min(float v1, float v2)
+            {
+                if (v1 >= v2)
                     return v2;
                 return v1;
             }
 
-            // truncate (for positive numbers)
-            float trunc(float v){
+            /**
+             * @brief Function to calculate the truncation of a given number
+             *
+             * @param v the value to truncate
+             * @return float the truncated value
+             */
+            float trunc(float v)
+            {
                 float r = v % 1;
                 return v - r;
             }
@@ -63,7 +110,8 @@ Shader "Custom/ColorFilter" {
             * @param rgb RGB space color to convert
             * @return HSV converted color
             */
-            float4 rgbConverter(float4 rgb) : COLOR {
+            float4 rgbConverter(float4 rgb) : COLOR
+            {
                 float r = rgb[0] * 255;
                 float g = rgb[1] * 255;
                 float b = rgb[2] * 255;
@@ -75,22 +123,28 @@ Shader "Custom/ColorFilter" {
                 float hue = 0.0;
                 float sat = 0.0;
                 float val = maxVal;
-                if (val == 0.0) {
+                if (val == 0.0)
+                {
                     sat = 0.0;
-                } else {
+                }
+                else
+                {
                     sat = span / val;
                 }
 
-                if (sat == 0.0) {
+                if (sat == 0.0)
+                {
                     hue = 0.0;
-                } else {
+                }
+                else
+                {
                     if (r == val)
                         hue = (g - b) / span;
                     else if (g == val)
                         hue = 2.0 + (b - r) / span;
                     else if (b == val)
                         hue = 4.0 + (r - g) / span;
-                    
+
                     hue *= 60.0;
                     if (hue < 0.0)
                         hue += 360.0;
@@ -107,7 +161,8 @@ Shader "Custom/ColorFilter" {
             * @param hsv HSV color to convert
             * @return converted RGB color
             */
-            float4 hsvConverter(float4 hsv) : COLOR {
+            float4 hsvConverter(float4 hsv) : COLOR
+            {
                 float r = 0.0;
                 float g = 0.0;
                 float b = 0.0;
@@ -115,17 +170,20 @@ Shader "Custom/ColorFilter" {
                 float sat = hsv[1];
                 float val = hsv[2];
 
-                if (sat == 0) {
+                if (sat == 0)
+                {
                     r = val;
                     g = val;
                     b = val;
-                } else {
+                }
+                else
+                {
                     int i;
                     float f, p, q, t;
 
                     if (hue == 360.0)
                         hue = 0.0;
-                    else   
+                    else
                         hue = hue / 60.0;
 
                     i = (int)(trunc(hue));
@@ -134,38 +192,39 @@ Shader "Custom/ColorFilter" {
                     q = val * (1.0 - (sat * f));
                     t = val * (1.0 - (sat * (1.0 - f)));
 
-                    switch (i) {
-                        case 0:
-                            r = val;
-                            g = t;
-                            b = p;
-                            break;
-                        case 1:
-                            r = q;
-                            g = val;
-                            b = p;
-                            break;
-                        case 2:
-                            r = p;
-                            g = val;
-                            b = t;
-                            break;
-                        case 3:
-                            r = p;
-                            g = q;
-                            b = val;
-                            break;
-                        case 4:
-                            r = t;
-                            g = p;
-                            b = val;
-                            break;
+                    switch (i)
+                    {
+                    case 0:
+                        r = val;
+                        g = t;
+                        b = p;
+                        break;
+                    case 1:
+                        r = q;
+                        g = val;
+                        b = p;
+                        break;
+                    case 2:
+                        r = p;
+                        g = val;
+                        b = t;
+                        break;
+                    case 3:
+                        r = p;
+                        g = q;
+                        b = val;
+                        break;
+                    case 4:
+                        r = t;
+                        g = p;
+                        b = val;
+                        break;
 
-                        default:
-                            r = val;
-                            g = p;
-                            b = q;
-                            break;
+                    default:
+                        r = val;
+                        g = p;
+                        b = q;
+                        break;
                     }
                 }
 
@@ -179,144 +238,203 @@ Shader "Custom/ColorFilter" {
             * @param rgb the rgb value of this fragment
             * @return Color the adjusted color to be rendered
             */
-            // float4 colorFilter(float4 hsv) : COLOR {
-            float4 colorFilter(float4 hsv) : COLOR {
+            float4 colorFilter(float4 hsv) : COLOR
+            {
                 // determine if the color at the current fragment is in line
                 // with expected saturation at this hue
                 float hue = hsv[0];
                 float sat = hsv[1] * 100;
                 float val = hsv[2] * 100;
 
-                if (hue >= 0.0 && hue <= 50.0) {
+                if (hue >= 0.0 && hue <= 50.0)
+                {
                     // this is the red-orange range
                     // expected saturation: 55-65%
-                    if (sat > (red_orange + 10.0)) {
+                    if (sat > (red_orange + 10.0))
+                    {
                         // create a more muted version of this color
                         //      => decrease saturation, subdue value
                         //      -----> if it is light, make value darker
                         //      -----> if it is dark, make value lighter
-                        if (val > 50.0) {
+                        if (val > 50.0)
+                        {
                             // light
                             sat -= 5.0;
                             val -= 5.0;
-                        } else if (val < 50.0) {
+                        }
+                        else if (val < 50.0)
+                        {
                             // dark
                             sat -= 5.0;
                             val += 5.0;
-                        } else {
+                        }
+                        else
+                        {
                             // neutral
                             sat -= 5.0;
                         }
-                    } else if (sat < red_orange) {
+                    }
+                    else if (sat < red_orange)
+                    {
                         // create a more intense version of this color
                         //      => increase saturation, enhance value
                         //      -----> if it is light, make value lighter
                         //      -----> if it is dark, make value darker
-                        if (val > 50.0) {
+                        if (val > 50.0)
+                        {
                             // light
                             sat += 5.0;
                             val += 5.0;
-                        } else if (val < 50.0) {
+                        }
+                        else if (val < 50.0)
+                        {
                             // dark
                             sat += 5.0;
                             val -= 5.0;
-                        } else {
+                        }
+                        else
+                        {
                             // neutral
                             sat += 5.0;
                         }
                     }
-                } else if (hue > 50.0 && hue <= 145.0) {
+                }
+                else if (hue > 50.0 && hue <= 145.0)
+                {
                     // this is the yellow-green range
                     // expected saturation: 80-90%
-                    if (sat > (yellow_green + 10.0)) {
+                    if (sat > (yellow_green + 10.0))
+                    {
                         // create a more muted version of this color
-                        if (val > 50.0) {
+                        if (val > 50.0)
+                        {
                             // light
                             sat -= 5.0;
                             val -= 5.0;
-                        } else if (val < 50.0) {
+                        }
+                        else if (val < 50.0)
+                        {
                             // dark
                             sat -= 5.0;
                             val += 5.0;
-                        } else {
+                        }
+                        else
+                        {
                             // neutral
                             sat -= 5.0;
                         }
-                    } else if (sat < yellow_green) {
+                    }
+                    else if (sat < yellow_green)
+                    {
                         // create a more intense version of this color
-                        if (val > 50.0) {
+                        if (val > 50.0)
+                        {
                             // light
                             sat += 5.0;
                             val += 5.0;
-                        } else if (val < 50.0) {
+                        }
+                        else if (val < 50.0)
+                        {
                             // dark
                             sat += 5.0;
                             val -= 5.0;
-                        } else {
+                        }
+                        else
+                        {
                             // neutral
                             sat += 5.0;
                         }
                     }
-                } else if (hue > 145.0 && hue <= 250.0) {
+                }
+                else if (hue > 145.0 && hue <= 250.0)
+                {
                     // this is the blue-indigo range
                     // expected saturation: 70-80%
-                    if (sat > (blue_indigo + 10.0)) {
+                    if (sat > (blue_indigo + 10.0))
+                    {
                         // create a more muted version of this color
-                        if (val > 50.0) {
+                        if (val > 50.0)
+                        {
                             // light
                             sat -= 5.0;
                             val -= 5.0;
-                        } else if (val < 50.0) {
+                        }
+                        else if (val < 50.0)
+                        {
                             // dark
                             sat -= 5.0;
                             val += 5.0;
-                        } else {
+                        }
+                        else
+                        {
                             // neutral
                             sat -= 5.0;
                         }
-                    } else if (sat < blue_indigo) {
+                    }
+                    else if (sat < blue_indigo)
+                    {
                         // create a more intense version of this color
-                        if (val > 50.0) {
+                        if (val > 50.0)
+                        {
                             // light
                             sat += 5.0;
                             val += 5.0;
-                        } else if (val < 50.0) {
+                        }
+                        else if (val < 50.0)
+                        {
                             // dark
                             sat += 5.0;
                             val -= 5.0;
-                        } else {
+                        }
+                        else
+                        {
                             // neutral
                             sat += 5.0;
                         }
                     }
-                } else {
+                }
+                else
+                {
                     // this is the violet-fuschia range
                     // expected saturation: 40-50%
-                    if (sat > (violet_fuschia + 10.0)) {
+                    if (sat > (violet_fuschia + 10.0))
+                    {
                         // create a more muted version of this color
-                        if (val > 50.0) {
+                        if (val > 50.0)
+                        {
                             // light
                             sat -= 5.0;
                             val -= 5.0;
-                        } else if (val < 50.0) {
+                        }
+                        else if (val < 50.0)
+                        {
                             // dark
                             sat -= 5.0;
                             val += 5.0;
-                        } else {
+                        }
+                        else
+                        {
                             // neutral
                             sat -= 5.0;
                         }
-                    } else if (sat < violet_fuschia) {
+                    }
+                    else if (sat < violet_fuschia)
+                    {
                         // create a more intense version of this color
-                        if (val > 50.0) {
+                        if (val > 50.0)
+                        {
                             // light
                             sat += 5.0;
                             val += 5.0;
-                        } else if (val < 50.0) {
+                        }
+                        else if (val < 50.0)
+                        {
                             // dark
                             sat += 5.0;
                             val -= 5.0;
-                        } else {
+                        }
+                        else
+                        {
                             // neutral
                             sat += 5.0;
                         }
@@ -333,18 +451,19 @@ Shader "Custom/ColorFilter" {
                     val = 100.0;
                 else if (val < 0.0)
                     val = 0.0;
-                 sat = sat / 100.0;
-                 val = val / 100.0;
+                sat = sat / 100.0;
+                val = val / 100.0;
 
                 return float4(hue, sat, val, 1.0);
-                // return hsv;
             }
 
-            float4 frag(v2f_img input) : COLOR {
+            half4 frag(Varyings IN) : SV_Target
+            {
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(IN)
+
                 // sample texture for color
-                float4 base = tex2D(_MainTex, input.uv);
-                //Debug.Log("pixel color: " + base);
-                
+                float4 base = SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, IN.texcoord);
+
                 // translate base color into HSV space
                 float4 hsv = rgbConverter(base);
 
@@ -355,21 +474,17 @@ Shader "Custom/ColorFilter" {
                 float4 rgb = hsvConverter(hsv);
 
                 // add color level parameters
-                rgb[0] += add_red;
-                rgb[1] += add_green;
-                rgb[2] += add_blue;
+                rgb.r += add_red;
+                rgb.g += add_green;
+                rgb.b += add_blue;
 
-                if(rgb[0] > 1.0)
-                    rgb[0] = 1.0;
-                if(rgb[1] > 1.0)
-                    rgb[1] = 1.0;
-                if(rgb[2] > 1.0)
-                    rgb[2] = 1.0;
+                rgb.r = clamp(rgb.r, 0.0f, 1.0f);
+                rgb.g = clamp(rgb.g, 0.0f, 1.0f);
+                rgb.b = clamp(rgb.b, 0.0f, 1.0f);
 
                 return rgb;
             }
-
-            ENDCG
+            ENDHLSL
         }
     }
 }
