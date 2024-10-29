@@ -2,22 +2,18 @@
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-internal class ColorFilterBlitRendererFeature : ScriptableRendererFeature
+internal class OutliningBlitRendererFeature : ScriptableRendererFeature
 {
     public Shader m_Shader;
 
-    public float redOrange = 55f;
-    public float yellowGreen = 80f;
-    public float blueIndigo = 70f;
-    public float violetFuschia = 40f;
-
-    public float addRed;
-    public float addGreen;
-    public float addBlue;
+    public float colorThreshold = .2f;
+    public float depthThreshold = .5f;
+    public float maxDepth = 1f;
+    public float outlineDimness = 0.5f;
 
     private Material m_Material;
 
-    private ColorFilterBlitPass m_RenderPass = null;
+    private OutliningBlitPass m_RenderPass = null;
 
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
@@ -32,17 +28,13 @@ internal class ColorFilterBlitRendererFeature : ScriptableRendererFeature
 
         // Calling ConfigureInput with the ScriptableRenderPassInput.Color argument
         // ensures that the opaque texture is available to the Render Pass.
-        m_RenderPass.ConfigureInput(ScriptableRenderPassInput.Color);
-        var settings = new ColorFilterBlitSettings
+        m_RenderPass.ConfigureInput(ScriptableRenderPassInput.Color | ScriptableRenderPassInput.Depth);
+        var settings = new OutliningBlitSettings
         {
-            RedOrange = redOrange,
-            YellowGreen = yellowGreen,
-            VioletFuschia = violetFuschia,
-            BlueIndigo = blueIndigo,
-
-            AddRed = addRed,
-            AddGreen = addGreen,
-            AddBlue = addBlue,
+            color_threshold = colorThreshold,
+            depth_threshold = depthThreshold,
+            max_depth = maxDepth,
+            outline_dimness = outlineDimness,
         };
         m_RenderPass.SetTarget(renderer.cameraColorTargetHandle, settings);
     }
@@ -50,9 +42,9 @@ internal class ColorFilterBlitRendererFeature : ScriptableRendererFeature
     public override void Create()
     {
         if (m_Shader == null)
-            m_Shader = Shader.Find("Custom/ColorFilter");
+            m_Shader = Shader.Find("Custom/EdgeDetection");
         m_Material = CoreUtils.CreateEngineMaterial(m_Shader);
-        m_RenderPass = new ColorFilterBlitPass(m_Material);
+        m_RenderPass = new OutliningBlitPass(m_Material);
     }
 
     protected override void Dispose(bool disposing)
