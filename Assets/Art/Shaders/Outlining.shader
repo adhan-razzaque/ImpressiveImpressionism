@@ -39,8 +39,8 @@ Shader "Custom/EdgeDetection"
             SAMPLER(sampler_CameraOpaqueTexture);
             TEXTURE2D_X(_CameraDepthTexture);
             SAMPLER(sampler_CameraDepthTexture);
+            float4 _BlitTexture_TexelSize; // (1/w, 1/h, w, h) "SourceSize"
             CBUFFER_START(UnityPerMaterial)
-                float4 _BlitTexture_TexelSize; // (1/w, 1/h, w, h) "SourceSize"
                 float color_threshold;
                 float depth_threshold;
                 float max_depth;
@@ -111,15 +111,15 @@ Shader "Custom/EdgeDetection"
                 //  0,   0,   0
                 // -1,  -2,  -1
 
-                float2 p1 = texCoord + float2(-1 * texelSize.x, texelSize.y);
+                float2 p1 = texCoord + float2(-texelSize.x, texelSize.y);
                 float2 p2 = texCoord + float2(0, texelSize.y);
                 float2 p3 = texCoord + float2(texelSize.x, texelSize.y);
-                float2 p4 = texCoord + float2(-1 * texelSize.x, 0);
+                float2 p4 = texCoord + float2(-texelSize.x, 0);
                 // float2 p5 = texCoord;
                 float2 p6 = texCoord + float2(texelSize.x, 0);
-                float2 p7 = texCoord + float2(-1 * texelSize.x, -1 * texelSize.y);
-                float2 p8 = texCoord + float2(0, -1 * texelSize.y);
-                float2 p9 = texCoord + float2(texelSize.x, -1 * texelSize.y);
+                float2 p7 = texCoord + float2(-texelSize.x, -texelSize.y);
+                float2 p8 = texCoord + float2(0, -texelSize.y);
+                float2 p9 = texCoord + float2(texelSize.x, -texelSize.y);
 
                 // Precalculate textures
                 float4 p1_tex = SAMPLE_TEXTURE2D(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, p1);
@@ -191,18 +191,18 @@ Shader "Custom/EdgeDetection"
 
             float4 getOutlineColor(float2 texCoord, float2 texelSize)
             {
-                // float2 sampleOffset =
-                //     float2 (0, (blurPixels / _BlitTexture_TexelSize.w) *
-                //         (i / BLUR_SAMPLES_RANGE));
-                float d0 = texCoord + float2(-1 * texelSize.x, texelSize.y);
+                // d0,  d1,  d2
+                // d3,  d4,  d5
+                // d6,  d7,  d8
+                float d0 = texCoord + float2(-texelSize.x, texelSize.y);
                 float d1 = texCoord + float2(0, texelSize.y);
                 float d2 = texCoord + float2(texelSize.x, texelSize.y);
-                float d3 = texCoord + float2(-1 * texelSize.x, 0);
+                float d3 = texCoord + float2(-texelSize.x, 0);
                 float d4 = texCoord;
                 float d5 = texCoord + float2(texelSize.x, 0);
-                float d6 = texCoord + float2(-1 * texelSize.x, -1 * texelSize.y);
-                float d7 = texCoord + float2(0, -1 * texelSize.y);
-                float d8 = texCoord + float2(texelSize.x, -1 * texelSize.y);
+                float d6 = texCoord + float2(-texelSize.x, -texelSize.y);
+                float d7 = texCoord + float2(0, -texelSize.y);
+                float d8 = texCoord + float2(texelSize.x, -texelSize.y);
 
                 /* calculate average color */
                 float4 color = float4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -240,12 +240,10 @@ Shader "Custom/EdgeDetection"
                     return base;
                 }
 
-                if (false
-                    // DepthSobelFilter(IN.texcoord, texel_size)
+                if (DepthSobelFilter(IN.texcoord, texel_size)
                     || ColorSobelFilter(IN.texcoord, texel_size)
                 )
                 {
-                    // return float4(0.0, 0.0f, 0.0f, 1.0f);
                     return getOutlineColor(IN.texcoord, texel_size);
                 }
 

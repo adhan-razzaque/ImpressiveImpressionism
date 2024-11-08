@@ -50,5 +50,7 @@ internal class OutliningBlitRendererFeature : ScriptableRendererFeature
     protected override void Dispose(bool disposing)
     {
         CoreUtils.Destroy(m_Material);
+        
+        m_RenderPass = null;
     }
 }
